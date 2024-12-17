@@ -34,7 +34,7 @@ show_system_menu() {
     echo -e "\033[1;32m8. 清理不再需要的软件包\033[0m"
     echo -e "\033[1;32m9. 更改系统名\033[0m"
     echo -e "\033[1;32m10. 设置快捷键 v\033[0m"
-    echo -e "\033[1;31m00. 更新本脚本\033[0m"
+    echo -e "\033[1;32m00. 更新本脚本\033[0m"
     echo -e "\033[1;34m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " system_choice
@@ -49,8 +49,8 @@ show_system_menu() {
         7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; sudo apt install -y nodejs ;;
         8) echo "清理不再需要的软件包..."; sudo apt autoremove -y ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
-        10) echo "设置快捷键 v..."; echo "alias v='source ~/.bashrc'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
-        00) echo "更新本脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh; echo "脚本已更新。" ;;
+        10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
+        00) echo "更新本脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && sudo mv linux.sh /usr/local/bin/linux-tools && /usr/local/bin/linux-tools ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
