@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.5 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.6 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -182,25 +182,28 @@ show_basic_tools_menu() {
 
 # 系统相关菜单
 show_system_menu() {
-    echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33m系统相关选项：\033[0m"
-    echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 更新系统\033[0m"
-    echo -e "\033[1;37m2. 清理不再需要的软件包\033[0m"
-    echo -e "\033[1;37m3. 更改系统名\033[0m"
-    echo -e "\033[1;37m4. 设置快捷键 v\033[0m"
-    echo -e "\033[1;37m5. 设置虚拟内存\033[0m"
-    echo -e "\033[1;37m6. 设置SSH端口\033[0m"
-    echo -e "\033[1;37m7. 开放所有端口\033[0m"
-    echo -e "\033[1;37m8. 设置时区为上海\033[0m"
-    echo -e "\033[1;37m9. 自动优化DNS地址\033[0m"
-    echo -e "\033[1;37m10. 系统内核优化\033[0m"
-    echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m0. 返回主菜单\033[0m"
-    echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号: " system_choice
+    clear
+    echo "=============================="
+    echo "系统相关选项："
+    echo "=============================="
+    echo "1. 更新系统"
+    echo "2. 清理不再需要的软件包"
+    echo "3. 更改系统名"
+    echo "4. 设置快捷键 v"
+    echo "5. 设置虚拟内存"
+    echo "6. 设置SSH端口"
+    echo "7. 开放所有端口"
+    echo "8. 设置时区为上海"
+    echo "9. 自动优化DNS地址"
+    echo "10. 系统内核优化"
+    echo "11. 开启root密码登入"
+    echo "12. 开启root密钥登入"
+    echo "=============================="
+    echo "0. 返回主菜单"
+    echo "=============================="
+    read -p "输入选项编号: " choice
 
-    case $system_choice in
+    case $choice in
         1) update_system ;;
         2) clean_packages ;;
         3) change_hostname ;;
@@ -211,8 +214,14 @@ show_system_menu() {
         8) set_timezone ;;
         9) optimize_dns ;;
         10) show_kernel_optimize ;;
+        11) enable_root_password ;;
+        12) enable_root_key ;;
         0) show_main_menu ;;
-        *) echo "无效选项，请重试。"; show_system_menu ;;
+        *) 
+            echo "无效选项"
+            sleep 1
+            show_system_menu
+            ;;
     esac
 }
 
@@ -825,6 +834,62 @@ docker_app_install() {
         esac
         break_end
     done
+}
+
+# 开启root密码登入
+enable_root_password() {
+    echo "正在配置root密码登入..."
+    
+    # 修改 SSH 配置允许 root 登录
+    sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sudo sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    
+    # 重启 SSH 服务
+    sudo systemctl restart sshd
+    
+    # 提示用户修改root密码
+    echo -e "\033[33m请设置root用户密码...\033[0m"
+    sudo passwd root
+    
+    echo -e "\033[32mroot密码登入已开启！\033[0m"
+    read -n 1 -s -r -p "按任意键继续..."
+    echo
+    show_system_menu
+}
+
+# 开启root密钥登入
+enable_root_key() {
+    echo "正在配置root密钥登入..."
+    
+    # 生成密钥对
+    KEY_FILE="$HOME/id_rsa_root"
+    ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q
+    
+    # 确保root的.ssh目录存在
+    sudo mkdir -p /root/.ssh
+    sudo chmod 700 /root/.ssh
+    
+    # 添加公钥到authorized_keys
+    sudo cp "$KEY_FILE.pub" /root/.ssh/authorized_keys
+    sudo chmod 600 /root/.ssh/authorized_keys
+    
+    # 修改 SSH 配置
+    sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sudo sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    
+    # 重启 SSH 服务
+    sudo systemctl restart sshd
+    
+    # 复制私钥到当前用户目录
+    cp "$KEY_FILE" "$HOME/"
+    chmod 600 "$HOME/id_rsa_root"
+    
+    echo -e "\033[32mroot密钥登入已配置完成！\033[0m"
+    echo -e "\033[33m私钥文件已保存到：$HOME/id_rsa_root\033[0m"
+    echo -e "\033[33m请妥善保管私钥文件，建议下载后删除服务器上的私钥\033[0m"
+    read -n 1 -s -r -p "按任意键继续..."
+    echo
+    show_system_menu
 }
 
 # 启动菜单
