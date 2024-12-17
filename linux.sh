@@ -66,13 +66,21 @@ show_script_menu() {
     esac
 }
 
-# 将脚本复制到系统程序目录
+# 检查并复制脚本到系统程序目录
 install_script() {
-    sudo cp $(realpath $0) /usr/local/bin/linux-tools
-    sudo chmod +x /usr/local/bin/linux-tools
-    echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
+    if [ ! -f /usr/local/bin/linux-tools ]; then
+        sudo cp $(realpath $0) /usr/local/bin/linux-tools
+        sudo chmod +x /usr/local/bin/linux-tools
+        echo "脚本已安装到 /usr/local/bin。"
+    else
+        echo "脚本已存在于 /usr/local/bin。"
+    fi
+    if ! grep -q "alias v='/usr/local/bin/linux-tools'" ~/.bashrc; then
+        echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
+        echo "快捷命令 'v' 已添加。"
+    fi
     source ~/.bashrc
-    echo "脚本已安装到 /usr/local/bin 并设置快捷命令 'v'。"
+    echo "快捷命令 'v' 已生效。"
 }
 
 # 运行安装脚本
