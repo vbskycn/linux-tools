@@ -26,7 +26,17 @@ if [ "$0" != "/usr/local/bin/linux-tools" ]; then
     chmod +x linux-tools.sh
     if ! diff linux-tools.sh /usr/local/bin/linux-tools > /dev/null 2>&1; then
         echo "脚本有更新，覆盖到 /usr/local/bin/..."
-        sudo mv linux-tools.sh /usr/local/bin/linux-tools
+        sudo cp linux-tools.sh /usr/local/bin/linux-tools
+        sudo chmod +x /usr/local/bin/linux-tools
+        rm linux-tools.sh
+        
+        # 更新别名设置
+        ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
+        if [ -f "$HOME/.bashrc" ]; then
+            sed -i '/^alias v=/d' "$HOME/.bashrc"
+            echo "$ALIAS_LINE" >> "$HOME/.bashrc"
+            source "$HOME/.bashrc" 2>/dev/null || true
+        fi
     else
         echo "脚本已是最新版本。"
         rm linux-tools.sh
@@ -36,6 +46,48 @@ if [ "$0" != "/usr/local/bin/linux-tools" ]; then
 fi
 
 show_toolbox_info
+
+# 检查并复制脚本到系统程序目录
+install_script() {
+    # 获取脚本的绝对路径
+    SCRIPT_PATH=$(readlink -f "$0")
+    
+    # 复制脚本到系统目录
+    echo "正在安装脚本到系统..."
+    sudo cp "$SCRIPT_PATH" /usr/local/bin/linux-tools
+    sudo chmod +x /usr/local/bin/linux-tools
+    
+    # 设置别名
+    ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
+    
+    # 更新 .bashrc
+    if [ -f "$HOME/.bashrc" ]; then
+        # 移除旧的别名（如果存在）
+        sed -i '/^alias v=/d' "$HOME/.bashrc"
+        # 添加新的别名
+        echo "$ALIAS_LINE" >> "$HOME/.bashrc"
+    else
+        # 如果 .bashrc 不存在，创建它
+        echo "$ALIAS_LINE" > "$HOME/.bashrc"
+    fi
+    
+    # 确保 .bash_profile 加载 .bashrc
+    if [ -f "$HOME/.bash_profile" ]; then
+        if ! grep -q "source.*\.bashrc" "$HOME/.bash_profile"; then
+            echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' >> "$HOME/.bash_profile"
+        fi
+    else
+        echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' > "$HOME/.bash_profile"
+    fi
+    
+    # 立即生效别名
+    source "$HOME/.bashrc" 2>/dev/null || true
+    
+    echo "脚本安装完成！"
+}
+
+# 运行安装脚本
+install_script
 
 # Detect the Linux distribution
 . /etc/os-release
@@ -783,27 +835,6 @@ docker_app_install() {
         break_end
     done
 }
-
-# 检查并复制脚本到系统程序目录
-install_script() {
-    if [ ! -f /usr/local/bin/linux-tools ]; then
-        sudo cp $(realpath $0) /usr/local/bin/linux-tools
-        sudo chmod +x /usr/local/bin/linux-tools
-    fi
-    if ! grep -q "alias v='/usr/local/bin/linux-tools'" ~/.bashrc; then
-        echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
-    fi
-    if [ ! -f ~/.bash_profile ]; then
-        touch ~/.bash_profile
-    fi
-    if ! grep -q "source ~/.bashrc" ~/.bash_profile; then
-        echo "if [ -f ~/.bashrc ]; then source ~/.bashrc; fi" >> ~/.bash_profile
-    fi
-    source ~/.bashrc
-}
-
-# 运行安装脚本
-install_script
 
 # 启动菜单
 show_main_menu
