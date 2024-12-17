@@ -28,6 +28,7 @@ show_system_menu() {
     echo "7. 安装 Node.js 和 npm"
     echo "8. 清理不再需要的软件包"
     echo "9. 更改系统名"
+    echo "10. 设置快捷键 v"
     echo "0. 返回主菜单"
     read -p "输入选项编号: " system_choice
 
@@ -41,6 +42,7 @@ show_system_menu() {
         7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; sudo apt install -y nodejs ;;
         8) echo "清理不再需要的软件包..."; sudo apt autoremove -y ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
+        10) echo "设置快捷键 v..."; echo "alias v='source ~/.bashrc'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
