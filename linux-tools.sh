@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.1 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -221,10 +221,6 @@ set_shortcut() {
             
             # 添加新的别名
             echo "$ALIAS_CMD" >> "$config_file"
-            
-            # 立即生效
-            source "$config_file" 2>/dev/null || true
-            
             echo "已在 $config_file 中设置快捷键"
             SUCCESS=true
         fi
@@ -233,27 +229,33 @@ set_shortcut() {
     # 如果没有找到任何配置文件，创建 .bashrc
     if [ "$SUCCESS" = false ]; then
         echo "$ALIAS_CMD" >> "$HOME/.bashrc"
-        source "$HOME/.bashrc" 2>/dev/null || true
         echo "已创建并设置 $HOME/.bashrc"
         SUCCESS=true
     fi
     
-    # 验证设置是否成功
-    if type v >/dev/null 2>&1; then
-        echo -e "\033[32m快捷键设置成功！\033[0m"
-        echo "现在可以使用 v 命令快速启动脚本"
-        echo "提示：如果当前终端中 v 命令不可用，请重新打开终端或执行 source ~/.bashrc"
-    else
-        echo -e "\033[31m快捷键设置可能未生效，请尝试以下方法：\033[0m"
-        echo "1. 重新打开终端"
-        echo "2. 手动执行: source ~/.bashrc"
-        echo "3. 重新登录系统"
-    fi
-    
     # 添加到 /etc/profile 以使所有用户都可以使用
     if [ "$(id -u)" = "0" ]; then
+        # 检查是否已存在v的别名，如果存在则删除
+        sed -i '/^alias v=/d' /etc/profile
         echo "$ALIAS_CMD" >> /etc/profile
         echo "已添加到系统级配置，所有用户都可以使用此快捷键"
+    fi
+    
+    # 立即生效别名
+    eval "$ALIAS_CMD"
+    
+    # 验证设置是否成功
+    if type v >/dev/null 2>&1; then
+        echo -e "\033[32m快捷键设置成功并已生效！\033[0m"
+        echo "现在可以使用 v 命令快速启动脚本"
+        echo -e "\033[33m注意：在新终端中使用快捷键可能需要：\033[0m"
+        echo "1. 重新打开终端"
+        echo "2. 或执行: source ~/.bashrc"
+    else
+        echo -e "\033[31m快捷键设置遇到问题，请尝试以下方法：\033[0m"
+        echo "1. 手动执行: source ~/.bashrc"
+        echo "2. 重新打开终端"
+        echo "3. 重新登录系统"
     fi
     
     read -n 1 -s -r -p "按任意键继续..."
