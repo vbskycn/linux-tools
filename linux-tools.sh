@@ -2,19 +2,16 @@
 
 # 显示脚本工具箱信息
 show_toolbox_info() {
-#!/bin/bash
-
-# 显示美化的标题信息
-echo -e "\033[1;34m  _      _                          _____              _      \033[0m"
-echo -e "\033[1;34m | |    (_) _ __   _   _ __  __    |_   _|___    ___  | | ___ \033[0m"
-echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __|\033[0m"
-echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
-echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
-echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.5 只为更简单的Linux使用！\033[0m"
-echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
-echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
-echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;34m  _      _                          _____              _      \033[0m"
+    echo -e "\033[1;34m | |    (_) _ __   _   _ __  __    |_   _|___    ___  | | ___ \033[0m"
+    echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __|\033[0m"
+    echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
+    echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.6 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
+    echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
 }
 
 # 自动更新脚本到 /usr/local/bin/
@@ -122,6 +119,21 @@ case "$ID" in
         exit 1
         ;;
 esac
+
+# 在每个安装步骤前添加进度显示函数
+show_progress() {
+    local current=$1
+    local total=$2
+    local width=50
+    local percentage=$((current * 100 / total))
+    local completed=$((width * current / total))
+    local remaining=$((width - completed))
+    
+    printf "\r["
+    printf "%${completed}s" | tr ' ' '#'
+    printf "%${remaining}s" | tr ' ' '-'
+    printf "] %d%%" $percentage
+}
 
 # 显示主菜单
 show_main_menu() {
@@ -436,7 +448,7 @@ set_swap() {
     echo "正在设置虚拟内存..."
     
     # 显示当前内存和swap使用情况
-    echo "当前内���使用情况:"
+    echo "当前内存使用情况:"
     free -h
     echo "------------------------"
     
@@ -474,7 +486,7 @@ set_swap() {
     
     echo "正在创建 ${swap_size}GB 虚拟内存..."
     
-    # 使用fallocate创建swap文件（更快且更可靠）
+    # 使用fallocate创建swap文件（更快且更可靠��
     if ! sudo fallocate -l ${swap_size}G /swapfile; then
         echo "使用fallocate建失败，尝试使用dd命令..."
         # 如果fallocate失败使用dd作为备选方案
@@ -544,7 +556,7 @@ set_ssh_port() {
     read -p "请输入新的SSH端口号(1-65535) [默认: 5522]: " new_port
     new_port=${new_port:-5522}  # 如果用户直接回车，使用默认值5522
     
-    # 检查端口号是否有效
+    # 检查端口号是��有效
     if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1 ] || [ "$new_port" -gt 65535 ]; then
         echo "无效的端口号！端口号必须在 1-65535 之间"
         echo -e "\033[1;32m按任意键返回...\033[0m"
@@ -722,7 +734,7 @@ EOF
     show_system_menu
 }
 
-# 高性能优化模式
+# 高性能优化模��
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -770,7 +782,7 @@ net.ipv4.tcp_wmem = 4096 87380 16777216
 net.ipv4.tcp_rmem = 4096 87380 16777216
 net.ipv4.tcp_fastopen = 3
 
-# 虚拟内存参数
+# 虚拟内存参���
 vm.swappiness = 10
 vm.dirty_ratio = 60
 vm.dirty_background_ratio = 30
@@ -844,7 +856,7 @@ EOF
 * hard nproc 32768
 EOF
 
-    echo "均衡优化模式配置完成！"
+    echo "均衡优化���式配置完成！"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -1055,7 +1067,7 @@ show_script_menu() {
     esac
 }
 
-# 应用市场菜单
+# 应用市场���单
 show_app_market() {
     clear
     echo -e "\033[1;34m==============================\033[0m"
@@ -1179,7 +1191,7 @@ enable_root_key() {
         REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
     fi
     
-    # 如果上面的方��失败，尝试其他方法
+    # 如果上面的方法失败，尝试其他方法
     if [ -z "$REAL_USER" ]; then
         REAL_USER=$SUDO_USER
     fi
@@ -1276,7 +1288,7 @@ server_init() {
     echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
     echo -e "\033[1;37m11. 设置时区为上海\033[0m"
     echo -e "\033[1;37m12. 优化DNS配置\033[0m"
-    echo -e "\033[1;37m14. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;37m13. 清理不再需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置，请确保知晓所有更改内容。\033[0m"
     read -p "是否继续？(y/n): " confirm
     
@@ -1291,15 +1303,20 @@ server_init() {
     echo -e "\033[1;33m开始执行自用服务器开箱配置...\033[0m"
     
     echo -e "\n\033[1;32m[1/13] 更新系统...\033[0m"
-    if [ -f /etc/debian_version ]; then
-        apt update && apt upgrade -y
-    elif [ -f /etc/redhat-release ]; then
-        yum update -y
-    elif [ -f /etc/alpine-release ]; then
-        apk update && apk upgrade
-    elif [ -f /etc/arch-release ]; then
-        pacman -Syu --noconfirm
-    fi
+    case "$ID" in
+        ubuntu|debian|kali)
+            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            yum update -y -q
+            ;;
+        arch)
+            pacman -Syu --noconfirm --quiet
+            ;;
+        alpine)
+            apk update --quiet && apk upgrade --quiet
+            ;;
+    esac
     
     echo -e "\n\033[1;32m[2/13] 安装常用工具...\033[0m"
     case "$ID" in
@@ -1318,9 +1335,14 @@ server_init() {
     esac
     
     echo -e "\n\033[1;32m[3/13] 安装Docker...\033[0m"
-    curl -fsSL https://get.docker.com | sh
-    systemctl enable docker
-    systemctl start docker
+    if ! command -v docker &> /dev/null; then
+        echo "Docker未安装，开始安装..."
+        curl -fsSL https://get.docker.com | sh
+        systemctl enable docker
+        systemctl start docker
+    else
+        echo "Docker已安装，跳过安装步骤"
+    fi
     
     echo -e "\n\033[1;32m[4/13] 安装开发工具...\033[0m"
     case "$ID" in
