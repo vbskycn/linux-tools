@@ -104,17 +104,12 @@ show_script_menu() {
 
 # 检查并复制脚本到系统程序目录
 install_script() {
-    echo "Starting install_script function..."
     if [ ! -f /usr/local/bin/linux-tools ]; then
         sudo cp $(realpath $0) /usr/local/bin/linux-tools
         sudo chmod +x /usr/local/bin/linux-tools
-        echo "脚本已安装到 /usr/local/bin。"
-    else
-        echo "脚本已存在于 /usr/local/bin。"
     fi
     if ! grep -q "alias v='/usr/local/bin/linux-tools'" ~/.bashrc; then
         echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
-        echo "快捷命令 'v' 已添加。"
     fi
     if [ ! -f ~/.bash_profile ]; then
         touch ~/.bash_profile
@@ -123,8 +118,6 @@ install_script() {
         echo "if [ -f ~/.bashrc ]; then source ~/.bashrc; fi" >> ~/.bash_profile
     fi
     source ~/.bashrc
-    echo "快捷命令 'v' 已生效。"
-    echo "Finished install_script function."
 }
 
 # 运行安装脚本

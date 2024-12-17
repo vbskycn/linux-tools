@@ -31,7 +31,11 @@
 要运行此脚本并访问菜单，请执行以下命令，这将下载脚本到本地并设置快捷键：
 
 ```bash
+github 代理版本
 curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && ./linux.sh
+
+github 直连版本
+curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && ./linux.sh
 ```
 
 然后，您可以通过在终端中输入 `v` 来快速启动本地脚本。
