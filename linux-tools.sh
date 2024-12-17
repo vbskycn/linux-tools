@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.98 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.1 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -322,6 +322,7 @@ show_system_menu() {
     echo -e "\033[1;37m13. linux内核优化-还原默认设置\033[0m"
     echo -e "\033[1;37m14. 开启root密码登入\033[0m"
     echo -e "\033[1;37m15. 开启root密钥登入\033[0m"
+    echo -e "\033[1;37m16. 自用服务器开箱\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回上级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
@@ -343,6 +344,7 @@ show_system_menu() {
         13|sys13) restore_defaults ;;
         14|sys14) enable_root_password ;;
         15|sys15) enable_root_key ;;
+        16|sys16) server_init ;;
         0) show_main_menu ;;
         *) 
             echo "无效选项，请重试。"
@@ -768,7 +770,7 @@ net.ipv4.tcp_wmem = 4096 87380 16777216
 net.ipv4.tcp_rmem = 4096 87380 16777216
 net.ipv4.tcp_fastopen = 3
 
-# 虚拟内存��数
+# 虚拟内存参数
 vm.swappiness = 10
 vm.dirty_ratio = 60
 vm.dirty_background_ratio = 30
@@ -967,7 +969,7 @@ EOF
 EOF
 
     echo "系统设置已还原为默认值！"
-    echo -e "\033[1;32m按任意键返���...\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
 }
@@ -1031,7 +1033,7 @@ show_script_menu() {
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号或代码: " choice
+    read -p "输入选项编号或代���: " choice
 
     case $choice in
         1|script1) 
@@ -1254,6 +1256,114 @@ enable_root_key() {
     echo -e "\033[33m私钥: $USER_KEY_FILE\033[0m"
     echo -e "\033[33m公钥: $USER_KEY_FILE.pub\033[0m"
     echo -e "\033[33m请下载私钥文件后删除服务器上的私钥\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
+    show_system_menu
+}
+
+# 添加自用服务器开箱函数
+server_init() {
+    echo -e "\033[1;33m开始执行自用服务器开箱配置...\033[0m"
+    
+    echo -e "\n\033[1;32m[1/13] 更新系统...\033[0m"
+    update_system
+    
+    echo -e "\n\033[1;32m[2/13] 安装常用工具...\033[0m"
+    case "$ID" in
+        ubuntu|debian|kali)
+            $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop inetutils-traceroute tmux
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            $PKG_INSTALL curl wget git vim unzip gcc make net-tools htop traceroute tmux
+            ;;
+        arch)
+            $PKG_INSTALL curl wget git vim unzip base-devel net-tools htop traceroute tmux
+            ;;
+        alpine)
+            $PKG_INSTALL curl wget git vim unzip build-base net-tools htop traceroute tmux
+            ;;
+    esac
+    
+    echo -e "\n\033[1;32m[3/13] 安装Docker...\033[0m"
+    case "$ID" in
+        ubuntu|debian|kali)
+            curl -fsSL https://get.docker.com | sh
+            $PKG_INSTALL docker-compose
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            curl -fsSL https://get.docker.com | sh
+            $PKG_INSTALL docker-compose
+            ;;
+        arch)
+            $PKG_INSTALL docker docker-compose
+            ;;
+        alpine)
+            $PKG_INSTALL docker docker-compose
+            ;;
+    esac
+    sudo systemctl enable docker
+    sudo systemctl start docker
+    
+    echo -e "\n\033[1;32m[4/13] 安装开发工具...\033[0m"
+    case "$ID" in
+        ubuntu|debian|kali)
+            $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            $PKG_INSTALL python3 python3-pip java-11-openjdk-devel gcc gcc-c++ make cmake
+            ;;
+        arch)
+            $PKG_INSTALL python python-pip jdk11-openjdk gcc make cmake
+            ;;
+        alpine)
+            $PKG_INSTALL python3 py3-pip openjdk11 gcc g++ make cmake
+            ;;
+    esac
+    
+    echo -e "\n\033[1;32m[5/13] 安装网络工具...\033[0m"
+    case "$ID" in
+        ubuntu|debian|kali)
+            $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            $PKG_INSTALL sshpass telnet nmap iperf3 bind-utils net-tools iputils
+            ;;
+        arch)
+            $PKG_INSTALL sshpass telnet nmap iperf3 bind-tools net-tools iputils
+            ;;
+        alpine)
+            $PKG_INSTALL sshpass busybox-extras nmap iperf3 bind-tools net-tools iputils
+            ;;
+    esac
+    
+    echo -e "\n\033[1;32m[6/13] 设置快捷键V...\033[0m"
+    set_shortcut
+    
+    echo -e "\n\033[1;32m[7/13] 配置系统内核高性能优化模式...\033[0m"
+    optimize_high_performance
+    
+    echo -e "\n\033[1;32m[8/13] 配置root密钥登入...\033[0m"
+    enable_root_key
+    
+    echo -e "\n\033[1;32m[9/13] 设置虚拟内存...\033[0m"
+    set_swap
+    
+    echo -e "\n\033[1;32m[10/13] 设置SSH端口...\033[0m"
+    set_ssh_port
+    
+    echo -e "\n\033[1;32m[11/13] 设置时区...\033[0m"
+    set_timezone
+    
+    echo -e "\n\033[1;32m[12/13] 优化DNS...\033[0m"
+    optimize_dns
+    
+    echo -e "\n\033[1;32m[13/13] 安装kejilion脚本...\033[0m"
+    curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
+    
+    echo -e "\n\033[1;32m[完成] 清理不再需要的软件包...\033[0m"
+    clean_packages
+    
+    echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
