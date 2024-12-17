@@ -439,6 +439,7 @@ set_shortcut() {
     fi
     
     echo "快捷键V设置完成！现在可以使用 v 命令快速启动脚本"
+    echo "如果没有生效，请重启终端或执行 source ~/.bashrc"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -1280,6 +1281,7 @@ server_init() {
     # 6. 设置快捷键V
     echo -e "\n\033[1;32m[6/13] 设置快捷键V...\033[0m"
     echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+    echo "如果没有生效，请重启终端或执行 source ~/.bashrc"
     sudo chmod +x /etc/profile.d/linux-tools-alias.sh
     
     # 7. 系统内核优化

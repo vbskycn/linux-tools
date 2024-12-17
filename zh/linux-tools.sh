@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.11 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.13 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -439,6 +439,7 @@ set_shortcut() {
     fi
     
     echo "快捷键V设置完成！现在可以使用 v 命令快速启动脚本"
+    echo "如果没有生效，请重启终端或执行 source ~/.bashrc"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -1189,7 +1190,16 @@ server_init() {
     echo -e "\033[1;37m13. 清理不���需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置。\033[0m"
     
-    # 自动确认，无需用户交互
+    # 添加确认提示
+    read -p "确认要执行以上操作吗? (y/n): " confirm
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo "已取消操作"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
     echo -e "\033[1;33m开始执行自用服务器开箱配置...\033[0m"
     
     # 1. 更新系统
@@ -1271,6 +1281,7 @@ server_init() {
     # 6. 设置快捷键V
     echo -e "\n\033[1;32m[6/13] 设置快捷键V...\033[0m"
     echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+    echo "如果没有生效，请重启终端或执行 source ~/.bashrc"
     sudo chmod +x /etc/profile.d/linux-tools-alias.sh
     
     # 7. 系统内核优化
