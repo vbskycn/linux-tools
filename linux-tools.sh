@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.3 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.4 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -49,10 +49,19 @@ install_script() {
     # 获取脚本的绝对路径
     SCRIPT_PATH=$(readlink -f "$0")
     
-    # 复制脚本到系统目录
-    echo "正在安装脚本到系统..."
-    sudo cp "$SCRIPT_PATH" /usr/local/bin/linux-tools
-    sudo chmod +x /usr/local/bin/linux-tools
+    # 修复主机名解析问题
+    if ! grep -q "127.0.0.1.*$(hostname)" /etc/hosts; then
+        echo "正在修复主机名解析..."
+        echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts > /dev/null
+    fi
+    
+    # 只有当脚本不在系统目录或内容不同时才复制
+    if [ "$SCRIPT_PATH" != "/usr/local/bin/linux-tools" ]; then
+        echo "正在安装脚本到系统..."
+        sudo cp "$SCRIPT_PATH" /usr/local/bin/linux-tools
+        sudo chmod +x /usr/local/bin/linux-tools
+        echo "脚本安装完成！"
+    fi
     
     # 设置别名
     ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
