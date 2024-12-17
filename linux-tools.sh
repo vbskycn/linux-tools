@@ -86,7 +86,7 @@ install_script() {
     # 立即生效别名
     source "$HOME/.bashrc" 2>/dev/null || true
     
-    echo "脚本安装完成！"
+    #echo "脚本安装完成！"
 }
 
 # 运行安装脚本
