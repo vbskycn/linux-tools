@@ -13,7 +13,13 @@ show_toolbox_info() {
 if [ "$0" != "/usr/local/bin/linux-tools" ]; then
     curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh
     chmod +x linux.sh
-    sudo mv linux.sh /usr/local/bin/linux-tools
+    if ! diff linux.sh /usr/local/bin/linux-tools > /dev/null 2>&1; then
+        echo "脚本有更新，覆盖到 /usr/local/bin/..."
+        sudo mv linux.sh /usr/local/bin/linux-tools
+    else
+        echo "脚本已是最新版本。"
+        rm linux.sh
+    fi
     exec /usr/local/bin/linux-tools "$@"
     exit
 fi
