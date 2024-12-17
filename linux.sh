@@ -66,16 +66,17 @@ show_script_menu() {
     esac
 }
 
-# 修改快捷命令设置
-setup_alias() {
-    echo "alias v='bash ~/linux-tools/linux.sh'" >> ~/.bashrc
+# 将脚本复制到系统程序目录
+install_script() {
+    sudo cp $(realpath $0) /usr/local/bin/linux-tools
+    sudo chmod +x /usr/local/bin/linux-tools
+    echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
     source ~/.bashrc
-    source ~/.bashrc
-    echo "快捷命令 'v' 已添加并生效。"
+    echo "脚本已安装到 /usr/local/bin 并设置快捷命令 'v'。"
 }
 
-# 运行快捷命令设置
-setup_alias
+# 运行安装脚本
+install_script
 
 # 启动菜单
 show_main_menu
