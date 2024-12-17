@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.26 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.27 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -137,7 +137,7 @@ show_system_menu() {
     echo -e "\033[1;32m5. 设置虚拟内存\033[0m"
     echo -e "\033[1;32m6. 设置SSH端口\033[0m"
     echo -e "\033[1;32m7. 开放所有端口\033[0m"
-    echo -e "\033[1;32m8. 设置系统时区\033[0m"
+    echo -e "\033[1;32m8. 设置时区为上海\033[0m"
     echo -e "\033[1;32m9. 自动优化DNS地址\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;31m0. 返回主菜单\033[0m"
@@ -213,16 +213,14 @@ show_system_menu() {
             show_system_menu ;;
             
         8)
-            echo "设置系统时区 (默认Asia/Shanghai)..."
-            read -p "请输入时区（直接回车默认Asia/Shanghai）: " timezone
-            timezone=${timezone:-"Asia/Shanghai"}
-            
-            if sudo timedatectl set-timezone $timezone; then
-                echo "系统时区已设置为 $timezone"
+            echo "正在设置系统时区为上海..."
+            if sudo timedatectl set-timezone Asia/Shanghai; then
+                echo "系统时区已设置为上海"
                 # 同步硬件时间
                 sudo hwclock --systohc
+                echo "系统时间已同步"
             else
-                echo "时区设置失败，请确认时区名称是否正确"
+                echo "时区设置失败，请检查系统权限"
             fi
             show_system_menu ;;
             
