@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.79 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.80 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -128,12 +128,12 @@ show_main_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m请选择一个选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;36m01. 系统相关 (sys)\033[0m"
-    echo -e "\033[1;36m02. 基础工具 (tool)\033[0m"
-    echo -e "\033[1;36m03. 脚本大全 (script)\033[0m"
-    echo -e "\033[1;36m04. 应用市场 (app)\033[0m"
+    echo -e "\033[1;36m1. 系统相关 (sys)\033[0m"
+    echo -e "\033[1;36m2. 基础工具 (tool)\033[0m"
+    echo -e "\033[1;36m3. 脚本大全 (script)\033[0m"
+    echo -e "\033[1;36m4. 应用市场 (app)\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m00. 更新脚本\033[0m"
+    echo -e "\033[1;32m9. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;31m0. 退出\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -218,26 +218,26 @@ show_system_menu() {
     echo "=============================="
     echo "系统相关选项："
     echo "=============================="
-    echo "01. 更新系统"
-    echo "02. 清理不再需要的软件包"
-    echo "03. 更改系统名"
-    echo "04. 设置快捷键 v"
-    echo "05. 设置虚拟内存"
-    echo "06. 设置SSH端口"
-    echo "07. 开放所有端口"
-    echo "08. 设置时区为上海"
-    echo "09. 自动优化DNS地址"
-    echo "10. 系统内核优化"
-    echo "11. 开启root密码登入"
-    echo "12. 开启root密钥登入"
-    echo "=============================="
-    echo "00. 返回主菜单"
+    echo "1. 更新系统"
+    echo "2. 清理不再需要的软件包"
+    echo "3. 更改系统名"
+    echo "4. 设置快捷键"
+    echo "5. 设置虚拟内存"
+    echo "6. 设置SSH端口"
+    echo "7. 开放所有端口"
+    echo "8. 设置时区"
+    echo "9. 优化DNS"
+    echo "10. 高性能优化模式"
+    echo "11. 均衡优化模式"
+    echo "12. 网站优化模式"
+    echo "13. 还原默认设置"
+    echo "0. 返回主菜单"
     echo "=============================="
     read -p "输入选项编号或代码: " choice
 
     # 如果输入的是纯数字，自动添加sys前缀
     if [[ $choice =~ ^[0-9]+$ ]]; then
-        if [ "$choice" = "00" ]; then
+        if [ "$choice" = "0" ]; then
             show_main_menu
             return
         fi
@@ -249,18 +249,19 @@ show_system_menu() {
     fi
 
     case $choice in
-        sys01) update_system ;;
-        sys02) clean_packages ;;
-        sys03) change_hostname ;;
-        sys04) set_shortcut ;;
-        sys05) set_swap ;;
-        sys06) set_ssh_port ;;
-        sys07) open_ports ;;
-        sys08) set_timezone ;;
-        sys09) optimize_dns ;;
-        sys10) show_kernel_optimize ;;
-        sys11) enable_root_password ;;
-        sys12) enable_root_key ;;
+        sys1) update_system ;;
+        sys2) clean_packages ;;
+        sys3) change_hostname ;;
+        sys4) set_shortcut ;;
+        sys5) set_swap ;;
+        sys6) set_ssh_port ;;
+        sys7) open_ports ;;
+        sys8) set_timezone ;;
+        sys9) optimize_dns ;;
+        sys10) optimize_high_performance ;;
+        sys11) optimize_balanced ;;
+        sys12) optimize_web_server ;;
+        sys13) restore_defaults ;;
         00) show_main_menu ;;
         *)
             echo "无效选项，请重试。"
@@ -323,66 +324,40 @@ set_shortcut() {
     # 定义要添加的别名命令
     ALIAS_CMD='alias v="/usr/local/bin/linux-tools"'
     
-    # 首先确保脚本已经被正确安装到系统目录
-    if [ ! -f "/usr/local/bin/linux-tools" ]; then
-        sudo cp "$(readlink -f "$0")" /usr/local/bin/linux-tools
-        sudo chmod +x /usr/local/bin/linux-tools
-    fi
-    
-    # 设置用户级别的别名
-    if [ -f "$HOME/.bashrc" ]; then
-        # 移除旧的别名配置
-        sed -i '/^alias.*v=.*linux-tools.*/d' "$HOME/.bashrc"
-        # 添加新的别名
-        echo "$ALIAS_CMD" >> "$HOME/.bashrc"
-        echo "已在 $HOME/.bashrc 中设置快捷键"
-    fi
-    
-    # 确保 .bash_profile 加载 .bashrc
-    if [ -f "$HOME/.bash_profile" ]; then
-        if ! grep -q "source.*\.bashrc" "$HOME/.bash_profile"; then
-            echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' >> "$HOME/.bash_profile"
-        fi
-        echo "已在 $HOME/.bash_profile 中设置快捷键"
-    fi
-    
-    # 设置系统级别的别名（如果是root用户）
-    if [ "$(id -u)" = "0" ]; then
-        # 在 /etc/profile.d/ 创建一个专门的别名文件
+    # 添加到系统级配置
+    if [ -d "/etc/profile.d" ]; then
         echo "$ALIAS_CMD" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
         sudo chmod +x /etc/profile.d/linux-tools-alias.sh
         echo "已添加到系统级配置，所有用户都可以使用此快捷键"
     fi
     
-    # 立即生效别名
-    eval "$ALIAS_CMD"
-    
-    echo -e "\033[32m快捷键设置完成！\033[0m"
-    echo "请执行以下命令使快捷键立即生效："
-    echo -e "\033[33msource ~/.bashrc\033[0m"
-    
-    read -n 1 -s -r -p "按任意键继续..."
-    echo
     show_system_menu
 }
 
 # 设置虚拟内存
 set_swap() {
     echo "正在设置虚拟内存..."
-    read -p "请输入要设置的虚拟内存大小（GB）: " swap_size
+    read -p "请输入要设置的虚拟内存大小(GB): " swap_size
     
-    # 检查是否已存在swap
-    swapoff -a
-    rm -f /swapfile
+    # 检查输入是否为数字
+    if ! [[ "$swap_size" =~ ^[0-9]+$ ]]; then
+        echo "请输入有效的数字！"
+        show_system_menu
+        return
+    fi
     
-    # 创建新的swap
-    fallocate -l ${swap_size}G /swapfile
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    # 创建swap文件
+    sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap_size
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
     
-    echo "虚拟内存设置完成！大小为 ${swap_size}GB"
+    # 添加到 fstab
+    if ! grep -q "/swapfile" /etc/fstab; then
+        echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+    fi
+    
+    echo "虚拟内存设置完成！"
     show_system_menu
 }
 
@@ -395,21 +370,21 @@ set_ssh_port() {
         echo "无效的端口号！端口号必须在 1-65535 之间"
         show_system_menu
         return
-    }
+    fi
     
     # 检查是否有 root 权限
     if [ "$(id -u)" != "0" ]; then
         echo "需要 root 权限来修改 SSH 配置"
         show_system_menu
         return
-    }
+    fi
     
     if ! sed -i "s/#Port 22/Port $new_port/" /etc/ssh/sshd_config || \
        ! sed -i "s/Port [0-9]*/Port $new_port/" /etc/ssh/sshd_config; then
         echo "修改 SSH 配置失败"
         show_system_menu
         return
-    }
+    fi
     
     if ! systemctl restart sshd; then
         echo "重启 SSH 服务失败"
@@ -445,14 +420,18 @@ open_ports() {
         firewall-cmd --zone=public --add-port=1-65535/udp --permanent
         firewall-cmd --reload
     fi
-    echo "所有端口已开放！"
+    echo "所有端口已开放"
     show_system_menu
 }
 
-# 设置时区
+# 设置时区为上海
 set_timezone() {
-    timedatectl set-timezone Asia/Shanghai
-    echo "时区已设置为上海时区"
+    echo "正在设置时区为上海..."
+    if ! sudo timedatectl set-timezone Asia/Shanghai; then
+        echo "设置时区失败"
+    else
+        echo "时区已设置为上海"
+    fi
     show_system_menu
 }
 
@@ -462,16 +441,14 @@ optimize_dns() {
     # 备份原始文件
     cp /etc/resolv.conf /etc/resolv.conf.bak
     
-    # 写入新的DNS配置
+    # 设置新的DNS服务器
     cat > /etc/resolv.conf << EOF
 nameserver 8.8.8.8
 nameserver 8.8.4.4
 nameserver 1.1.1.1
 EOF
     
-    # 防止文件被覆盖
-    chattr +i /etc/resolv.conf
-    echo "DNS设置已完成并已防止自动修改"
+    echo "DNS优化完成！"
     show_system_menu
 }
 
@@ -479,7 +456,7 @@ EOF
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
-# 系统级别的能���打开的文件描述符数量
+# 系统级别的能打开的文件描述符数量
 fs.file-max = 1000000
 # 单个进程能够打开的文件描述符数量
 fs.nr_open = 1000000
@@ -504,7 +481,7 @@ kernel.threads-max = 30000
 # 允许更多的网络连接
 net.core.somaxconn = 65535
 net.core.netdev_max_backlog = 65535
-# 调整网络缓冲区大小
+# 调整络缓冲区大小
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
 net.core.wmem_default = 262144
@@ -725,14 +702,14 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m02. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
-    echo -e "\033[1;37m03. 网站优化模式：       针对网站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
-    echo -e "\033[1;37m04. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
-    echo -e "\033[1;37m05. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
-    echo -e "\033[1;37m06. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对网站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
+    echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
+    echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
+    echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
-    echo -e "\033[1;32m00. 返回上一级\033[0m"
+    echo -e "\033[1;32m0. 返回上一级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     read -e -p "请输入你的选择: " kernel_choice
 
@@ -846,14 +823,6 @@ show_app_market() {
             show_app_market
             ;;
         app04)
-            # 检查是否已安装宝塔面板
-            if [ ! -f "/etc/init.d/bt" ]; then
-                echo -e "\033[33m未检测到宝塔面板，正在安装官方版...\033[0m"
-                wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
-                echo -e "\033[32m宝塔面板官方版安装完成！\033[0m"
-                echo -e "\033[33m现在开始安装开心版...\033[0m"
-                sleep 2
-            fi
             echo "安装宝塔开心版..."
             curl http://io.bt.sy/install/update6.sh|bash
             show_app_market
