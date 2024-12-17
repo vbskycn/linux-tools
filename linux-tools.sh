@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.90 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.91 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -189,6 +189,8 @@ show_basic_tools_menu() {
                     ;;
             esac
             echo "安装完成"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
             show_basic_tools_menu 
             ;;
         2|tool2) 
@@ -230,6 +232,9 @@ show_basic_tools_menu() {
                     $PKG_INSTALL python3 py3-pip openjdk11 gcc g++ make cmake
                     ;;
             esac
+            echo "开发工具安装完成！"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
             show_basic_tools_menu 
             ;;
         4|tool4) 
@@ -248,6 +253,9 @@ show_basic_tools_menu() {
                     $PKG_INSTALL sshpass busybox-extras nmap iperf3 bind-tools net-tools iputils
                     ;;
             esac
+            echo "网络工具安装完成！"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
             show_basic_tools_menu 
             ;;
         5|tool5) 
@@ -387,6 +395,8 @@ update_system() {
     elif [ -f /etc/arch-release ]; then
         pacman -Syu --noconfirm
     fi
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -403,6 +413,8 @@ clean_packages() {
         pacman -Sc --noconfirm
     fi
     echo "清理完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -411,23 +423,22 @@ change_hostname() {
     read -p "请输入新的主机名: " new_hostname
     hostnamectl set-hostname $new_hostname
     echo "系统名已更改为: $new_hostname"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
 # 设置快捷键
 set_shortcut() {
     echo "正在设置快捷键..."
-    
-    # 定义要添加的别名命令
     ALIAS_CMD='alias v="/usr/local/bin/linux-tools"'
-    
-    # 添加到系统级配置
     if [ -d "/etc/profile.d" ]; then
         echo "$ALIAS_CMD" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
         sudo chmod +x /etc/profile.d/linux-tools-alias.sh
-        echo "已添加到系统级配置，所有用户都可以使用此快捷键"
+        echo "已添加到系统级置，所有用户都可以使用此快捷键"
     fi
-    
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -439,6 +450,8 @@ set_swap() {
     # 检查输入是否为数字
     if ! [[ "$swap_size" =~ ^[0-9]+$ ]]; then
         echo "请输入有效的数字！"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
         show_system_menu
         return
     fi
@@ -455,6 +468,8 @@ set_swap() {
     fi
     
     echo "虚拟内存设置完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -465,6 +480,8 @@ set_ssh_port() {
     # 检查端口号是否有效
     if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1 ] || [ "$new_port" -gt 65535 ]; then
         echo "无效的端口号！端口号必须在 1-65535 之间"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
         show_system_menu
         return
     fi
@@ -472,6 +489,8 @@ set_ssh_port() {
     # 检查是否有 root 权限
     if [ "$(id -u)" != "0" ]; then
         echo "需要 root 权限来修改 SSH 配置"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
         show_system_menu
         return
     fi
@@ -479,6 +498,8 @@ set_ssh_port() {
     if ! sed -i "s/#Port 22/Port $new_port/" /etc/ssh/sshd_config || \
        ! sed -i "s/Port [0-9]*/Port $new_port/" /etc/ssh/sshd_config; then
         echo "修改 SSH 配置失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
         show_system_menu
         return
     fi
@@ -488,6 +509,8 @@ set_ssh_port() {
     else
         echo "SSH端口已更改为: $new_port"
     fi
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -495,6 +518,8 @@ set_ssh_port() {
 open_ports() {
     if [ "$(id -u)" != "0" ]; then
         echo "需要 root 权限来配置防火墙"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
         show_system_menu
         return
     fi
@@ -502,6 +527,8 @@ open_ports() {
     if [ -f /etc/debian_version ]; then
         if ! apt update || ! apt install -y ufw; then
             echo "安装 ufw 失败"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
             show_system_menu
             return
         fi
@@ -510,6 +537,8 @@ open_ports() {
     elif [ -f /etc/redhat-release ]; then
         if ! systemctl start firewalld; then
             echo "启动 firewalld 失败"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
             show_system_menu
             return
         fi
@@ -518,6 +547,8 @@ open_ports() {
         firewall-cmd --reload
     fi
     echo "所有端口已开放"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -529,6 +560,8 @@ set_timezone() {
     else
         echo "时区已设置为上海"
     fi
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -545,7 +578,9 @@ nameserver 8.8.4.4
 nameserver 1.1.1.1
 EOF
     
-    echo "DNS化完成！"
+    echo "DNS优化完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -618,6 +653,8 @@ EOF
 EOF
 
     echo "高性能优化模式配置完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -670,6 +707,8 @@ EOF
 EOF
 
     echo "均衡优化模式配置完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -717,6 +756,8 @@ EOF
 EOF
 
     echo "网站服务器优化模式配置完成！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -789,7 +830,9 @@ EOF
 # End of file
 EOF
 
-    echo "系统设置已还原为默认值！"
+    echo "系��设置已还原为默认值！"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -799,10 +842,10 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     大化系统性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡优化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
-    echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
+    echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
     echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
@@ -855,8 +898,20 @@ show_script_menu() {
     read -p "输入选项编号或代码: " choice
 
     case $choice in
-        1|script1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
-        2|script2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
+        1|script1) 
+            echo "安装 kejilion 脚本..."
+            curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_script_menu 
+            ;;
+        2|script2) 
+            echo "安装 勇哥的SB 脚本..."
+            bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh)
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_script_menu 
+            ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
@@ -880,11 +935,41 @@ show_app_market() {
     read -e -p "输入选项编号或代码: " choice
 
     case $choice in
-        1|app1) echo "安装宝塔面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
-        2|app2) echo "安装aaPanel宝塔国际版..."; wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel; show_app_market ;;
-        3|app3) echo "安装1Panel新一代管理面板..."; curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh; show_app_market ;;
-        4|app4) echo "安装宝塔开心版..."; curl http://io.bt.sy/install/update6.sh|bash; show_app_market ;;
-        5|app5) echo "还原到宝塔官方版..."; curl http://download.bt.cn/install/update6.sh|bash; show_app_market ;;
+        1|app1) 
+            echo "安装宝塔面板官方版..."
+            wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_app_market 
+            ;;
+        2|app2) 
+            echo "安装aaPanel宝塔国际版..."
+            wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_app_market 
+            ;;
+        3|app3) 
+            echo "安装1Panel新一代管理面板..."
+            curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_app_market 
+            ;;
+        4|app4) 
+            echo "安装宝塔开心版..."
+            curl http://io.bt.sy/install/update6.sh|bash
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_app_market 
+            ;;
+        5|app5) 
+            echo "还原到宝塔官方版..."
+            curl http://download.bt.cn/install/update6.sh|bash
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_app_market 
+            ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_app_market ;;
     esac
