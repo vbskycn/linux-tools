@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.86 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.87 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -170,12 +170,47 @@ show_basic_tools_menu() {
     read -p "输入选项编号或代码: " tools_choice
 
     case $tools_choice in
-        1|tool1) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
-        2|tool2) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; show_basic_tools_menu ;;
-        3|tool3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
-        4|tool4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
-        5|tool5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
-        6|tool6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        1|tool1) 
+            echo "安装常用工具..."
+            if ! $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; then
+                echo "安装失败，请检查权限或网络连接"
+            else
+                echo "安装完成"
+            fi
+            show_basic_tools_menu 
+            ;;
+        2|tool2) 
+            echo "安装 Docker..."
+            if ! $PKG_INSTALL docker.io docker-compose; then
+                echo "Docker 安装失败"
+            else
+                sudo systemctl enable docker
+                sudo systemctl start docker
+                echo "Docker 安装完成"
+            fi
+            show_basic_tools_menu 
+            ;;
+        3|tool3) 
+            echo "安装开发工具..."
+            $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
+            show_basic_tools_menu 
+            ;;
+        4|tool4) 
+            echo "安装网络工具..."
+            $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
+            show_basic_tools_menu 
+            ;;
+        5|tool5) 
+            echo "安装常用数据库..."
+            $PKG_INSTALL mysql-server postgresql redis-server mongodb
+            show_basic_tools_menu 
+            ;;
+        6|tool6) 
+            echo "安装 Node.js 和 npm..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            $PKG_INSTALL nodejs
+            show_basic_tools_menu 
+            ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
     esac
@@ -218,24 +253,21 @@ show_system_menu() {
     fi
 
     case $choice in
-        sys1) update_system ;;
-        sys2) clean_packages ;;
-        sys3) change_hostname ;;
-        sys4) set_shortcut ;;
-        sys5) set_swap ;;
-        sys6) set_ssh_port ;;
-        sys7) open_ports ;;
-        sys8) set_timezone ;;
-        sys9) optimize_dns ;;
-        sys10) optimize_high_performance ;;
-        sys11) optimize_balanced ;;
-        sys12) optimize_web_server ;;
-        sys13) restore_defaults ;;
-        00) show_main_menu ;;
-        *)
-            echo "无效选项，请重试。"
-            show_system_menu
-            ;;
+        1|sys1) update_system ;;
+        2|sys2) clean_packages ;;
+        3|sys3) change_hostname ;;
+        4|sys4) set_shortcut ;;
+        5|sys5) set_swap ;;
+        6|sys6) set_ssh_port ;;
+        7|sys7) open_ports ;;
+        8|sys8) set_timezone ;;
+        9|sys9) optimize_dns ;;
+        10|sys10) optimize_high_performance ;;
+        11|sys11) optimize_balanced ;;
+        12|sys12) optimize_web_server ;;
+        13|sys13) restore_defaults ;;
+        0) show_main_menu ;;
+        *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
 }
 
@@ -397,7 +429,7 @@ open_ports() {
 set_timezone() {
     echo "正在设置时区为上海..."
     if ! sudo timedatectl set-timezone Asia/Shanghai; then
-        echo "设置时区失败"
+        echo "���置时区失败"
     else
         echo "时区已设置为上海"
     fi
@@ -421,7 +453,7 @@ EOF
     show_system_menu
 }
 
-# 性能优化模式
+# 高性能优化模式
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -490,7 +522,7 @@ EOF
 EOF
 
     echo "高性能优化模式配置完成！"
-    show_kernel_optimize
+    show_system_menu
 }
 
 # 均衡优化模式
@@ -542,7 +574,7 @@ EOF
 EOF
 
     echo "均衡优化模式配置完成！"
-    show_kernel_optimize
+    show_system_menu
 }
 
 # 网站优化模式
@@ -589,7 +621,7 @@ EOF
 EOF
 
     echo "网站服务器优化模式配置完成！"
-    show_kernel_optimize
+    show_system_menu
 }
 
 # 还原默认设置
@@ -662,7 +694,7 @@ EOF
 EOF
 
     echo "系统设置已还原为默认值！"
-    show_kernel_optimize
+    show_system_menu
 }
 
 # 内核优化菜单
@@ -672,13 +704,13 @@ show_kernel_optimize() {
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
-    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度���整体性能。\033[0m"
+    echo -e "\033[1;37m2. 均衡优化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
     echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
-    echo -e "\033[1;32m0. 返回上一级\033[0m"
+    echo -e "\033[1;32m0. 返回上��级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     read -e -p "请输入你的选择: " kernel_choice
 
@@ -801,7 +833,7 @@ enable_root_key() {
     sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
     sudo sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     
-    # ��启 SSH 服务
+    # 重启 SSH 服务
     sudo systemctl restart sshd
     
     # 复制私钥到当前用户目录
