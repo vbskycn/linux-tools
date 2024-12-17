@@ -146,7 +146,7 @@ show_script_menu() {
     case $script_choice in
         1) echo "安装 kejilion 脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
         2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://github.zhoujie218.top/https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
-        3) echo "安装宝塔开行版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
+        3) echo "安装宝塔开心版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
         4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
