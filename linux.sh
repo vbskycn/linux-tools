@@ -70,19 +70,12 @@ show_script_menu() {
 setup_alias() {
     echo "alias v='bash ~/linux-tools/linux.sh'" >> ~/.bashrc
     source ~/.bashrc
+    source ~/.bashrc
     echo "快捷命令 'v' 已添加并生效。"
 }
 
-# 下载并设置本地脚本
-setup_local_script() {
-    mkdir -p ~/linux-tools
-    curl -sSL https://ghp.ci/raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh -o ~/linux-tools/linux.sh
-    chmod +x ~/linux-tools/linux.sh
-    echo "本地脚本已下载并设置完成。"
-}
-
-# 运行本地脚本设置
-setup_local_script
+# 运行快捷命令设置
+setup_alias
 
 # 启动菜单
 show_main_menu
