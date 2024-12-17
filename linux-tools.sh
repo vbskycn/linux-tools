@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.71 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.72 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -735,14 +735,15 @@ show_app_market() {
         4)
             # 检查是否已安装宝塔面板
             if [ ! -f "/etc/init.d/bt" ]; then
-                echo -e "\033[31m请先安装宝塔面板官方版（选项1）再安装开心版！\033[0m"
+                echo -e "\033[33m未检测到宝塔面板，正在安装官方版...\033[0m"
+                wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
+                echo -e "\033[32m宝塔面板官方版安装完成！\033[0m"
+                echo -e "\033[33m现在开始安装开心版...\033[0m"
                 sleep 2
-                show_app_market
-            else
-                echo "安装宝塔开心版..."
-                curl http://io.bt.sy/install/update6.sh|bash
-                show_app_market
             fi
+            echo "安装宝塔开心版..."
+            curl http://io.bt.sy/install/update6.sh|bash
+            show_app_market
             ;;
         5)
             echo "还原到宝塔官方版..."
