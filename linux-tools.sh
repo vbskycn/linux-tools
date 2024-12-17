@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.2 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.3 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -1276,7 +1276,6 @@ server_init() {
     echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
     echo -e "\033[1;37m11. 设置时区为上海\033[0m"
     echo -e "\033[1;37m12. 优化DNS配置\033[0m"
-    echo -e "\033[1;37m13. 安装kejilion脚本\033[0m"
     echo -e "\033[1;37m14. 清理不再需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置，请确保知晓所有更改内容。\033[0m"
     read -p "是否继续？(y/n): " confirm
@@ -1464,9 +1463,6 @@ EOF
     elif [ -f /etc/arch-release ]; then
         pacman -Sc --noconfirm
     fi
-    
-    echo -e "\n\033[1;32m[13/13] 安装kejilion脚本...\033[0m"
-    curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
 
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
