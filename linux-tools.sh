@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.87 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.88 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -172,43 +172,118 @@ show_basic_tools_menu() {
     case $tools_choice in
         1|tool1) 
             echo "安装常用工具..."
-            if ! $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; then
-                echo "安装失败，请检查权限或网络连接"
-            else
-                echo "安装完成"
-            fi
+            case "$ID" in
+                ubuntu|debian|kali)
+                    $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop inetutils-traceroute tmux
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    $PKG_INSTALL curl wget git vim unzip gcc make net-tools htop traceroute tmux
+                    ;;
+                arch)
+                    $PKG_INSTALL curl wget git vim unzip base-devel net-tools htop traceroute tmux
+                    ;;
+                alpine)
+                    $PKG_INSTALL curl wget git vim unzip build-base net-tools htop traceroute tmux
+                    ;;
+            esac
+            echo "安装完成"
             show_basic_tools_menu 
             ;;
         2|tool2) 
             echo "安装 Docker..."
-            if ! $PKG_INSTALL docker.io docker-compose; then
-                echo "Docker 安装失败"
-            else
-                sudo systemctl enable docker
-                sudo systemctl start docker
-                echo "Docker 安装完成"
-            fi
+            case "$ID" in
+                ubuntu|debian|kali)
+                    curl -fsSL https://get.docker.com | sh
+                    $PKG_INSTALL docker-compose
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    curl -fsSL https://get.docker.com | sh
+                    $PKG_INSTALL docker-compose
+                    ;;
+                arch)
+                    $PKG_INSTALL docker docker-compose
+                    ;;
+                alpine)
+                    $PKG_INSTALL docker docker-compose
+                    ;;
+            esac
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            echo "Docker 安装完成"
             show_basic_tools_menu 
             ;;
         3|tool3) 
             echo "安装开发工具..."
-            $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
+            case "$ID" in
+                ubuntu|debian|kali)
+                    $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    $PKG_INSTALL python3 python3-pip java-11-openjdk-devel gcc gcc-c++ make cmake
+                    ;;
+                arch)
+                    $PKG_INSTALL python python-pip jdk11-openjdk gcc make cmake
+                    ;;
+                alpine)
+                    $PKG_INSTALL python3 py3-pip openjdk11 gcc g++ make cmake
+                    ;;
+            esac
             show_basic_tools_menu 
             ;;
         4|tool4) 
             echo "安装网络工具..."
-            $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
+            case "$ID" in
+                ubuntu|debian|kali)
+                    $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    $PKG_INSTALL sshpass telnet nmap iperf3 bind-utils net-tools iputils
+                    ;;
+                arch)
+                    $PKG_INSTALL sshpass telnet nmap iperf3 bind-tools net-tools iputils
+                    ;;
+                alpine)
+                    $PKG_INSTALL sshpass busybox-extras nmap iperf3 bind-tools net-tools iputils
+                    ;;
+            esac
             show_basic_tools_menu 
             ;;
         5|tool5) 
             echo "安装常用数据库..."
-            $PKG_INSTALL mysql-server postgresql redis-server mongodb
+            case "$ID" in
+                ubuntu|debian|kali)
+                    $PKG_INSTALL mysql-server postgresql redis-server
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    $PKG_INSTALL mysql-server postgresql-server redis
+                    ;;
+                arch)
+                    $PKG_INSTALL mysql postgresql redis
+                    ;;
+                alpine)
+                    $PKG_INSTALL mysql postgresql redis
+                    ;;
+            esac
             show_basic_tools_menu 
             ;;
         6|tool6) 
             echo "安装 Node.js 和 npm..."
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            $PKG_INSTALL nodejs
+            case "$ID" in
+                ubuntu|debian|kali)
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                    $PKG_INSTALL nodejs
+                    ;;
+                centos|redhat|fedora|alma|rocky)
+                    curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+                    $PKG_INSTALL nodejs
+                    ;;
+                arch)
+                    $PKG_INSTALL nodejs npm
+                    ;;
+                alpine)
+                    $PKG_INSTALL nodejs npm
+                    ;;
+            esac
             show_basic_tools_menu 
             ;;
         0) show_main_menu ;;
@@ -429,7 +504,7 @@ open_ports() {
 set_timezone() {
     echo "正在设置时区为上海..."
     if ! sudo timedatectl set-timezone Asia/Shanghai; then
-        echo "���置时区失败"
+        echo "设置时区失败"
     else
         echo "时区已设置为上海"
     fi
@@ -708,9 +783,9 @@ show_kernel_optimize() {
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
-    echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
+    echo -e "\033[1;37m6. 还原默认设置：       将系��设置还原为默认配置。\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
-    echo -e "\033[1;32m0. 返回上��级\033[0m"
+    echo -e "\033[1;32m0. 返回上级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     read -e -p "请输入你的选择: " kernel_choice
 
@@ -755,7 +830,7 @@ show_script_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号或代码: " choice
+    read -p "输入选项��号或代码: " choice
 
     case $choice in
         1|script1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
@@ -782,7 +857,7 @@ show_app_market() {
     read -e -p "输入选项编号或代码: " choice
 
     case $choice in
-        1|app1) echo "安装宝塔面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
+        1|app1) echo "安装宝���面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
         2|app2) echo "安装aaPanel宝塔国际版..."; wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel; show_app_market ;;
         3|app3) echo "安装1Panel新一代管理面板..."; curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh; show_app_market ;;
         4|app4) echo "安装宝塔开心版..."; curl http://io.bt.sy/install/update6.sh|bash; show_app_market ;;
@@ -804,7 +879,7 @@ enable_root_password() {
     sudo systemctl restart sshd
     
     # 提示用户修改root密码
-    echo -e "\033[33m请设置root用户密码...\033[0m"
+    echo -e "\033[33m请设置root用户��码...\033[0m"
     sudo passwd root
     
     echo -e "\033[32mroot密码登入已启用！\033[0m"
