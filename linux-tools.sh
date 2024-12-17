@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.81 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.82 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -311,7 +311,7 @@ clean_packages() {
 
 # 更改系统名
 change_hostname() {
-    read -p "请输入新的主机名: " new_hostname
+    read -p "请输入���的主机名: " new_hostname
     hostnamectl set-hostname $new_hostname
     echo "系统名已更改为: $new_hostname"
     show_system_menu
@@ -357,7 +357,7 @@ set_swap() {
         echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     fi
     
-    echo "虚拟内存设置完成！"
+    echo "虚拟���存设置完成！"
     show_system_menu
 }
 
@@ -448,7 +448,7 @@ nameserver 8.8.4.4
 nameserver 1.1.1.1
 EOF
     
-    echo "DNS���化完成！"
+    echo "DNS化完成！"
     show_system_menu
 }
 
@@ -468,7 +468,7 @@ kernel.panic_on_oops = 1
 kernel.pid_max = 65535
 # 内核所允许的最大共享内存段的大小
 kernel.shmmax = 68719476736
-# 在任何给定时刻，系统上可以使用的共享内存的总量
+# 在任何给��时刻，系统上可以使用的共享内存的总量
 kernel.shmall = 4294967296
 # 设置消息队列
 kernel.msgmnb = 65536
@@ -524,7 +524,7 @@ EOF
     show_kernel_optimize
 }
 
-# 均衡优化模式
+# 均��优化模式
 optimize_balanced() {
     # 系统参数优化（均衡模式）
     cat > /etc/sysctl.conf << EOF
@@ -791,7 +791,7 @@ show_app_market() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -e -p "请输入选项编号或代码: " choice
+    read -e -p "输入选项编号或代码: " choice
 
     # 如果输入的是纯数字，自动添加app前缀
     if [[ $choice =~ ^[0-9]+$ ]]; then
