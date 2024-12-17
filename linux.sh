@@ -3,7 +3,7 @@
 # 显示脚本工具箱信息
 show_toolbox_info() {
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.1 只为更简单的Linux的使用！\033[0m"
+    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.2 只为更简单的Linux的使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m-输入v可快速启动此脚本-\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -25,6 +25,37 @@ if [ "$0" != "/usr/local/bin/linux-tools" ]; then
 fi
 
 show_toolbox_info
+
+# Detect the Linux distribution
+. /etc/os-release
+
+# Set package manager commands based on distribution
+case "$ID" in
+    ubuntu|debian|kali)
+        PKG_UPDATE="sudo apt update -y && sudo apt upgrade -y"
+        PKG_INSTALL="sudo apt install -y"
+        PKG_REMOVE="sudo apt autoremove -y"
+        ;;
+    centos|redhat|fedora|alma|rocky)
+        PKG_UPDATE="sudo yum update -y"
+        PKG_INSTALL="sudo yum install -y"
+        PKG_REMOVE="sudo yum autoremove -y"
+        ;;
+    arch)
+        PKG_UPDATE="sudo pacman -Syu --noconfirm"
+        PKG_INSTALL="sudo pacman -S --noconfirm"
+        PKG_REMOVE="sudo pacman -Rns --noconfirm"
+        ;;
+    alpine)
+        PKG_UPDATE="sudo apk update"
+        PKG_INSTALL="sudo apk add"
+        PKG_REMOVE="sudo apk del"
+        ;;
+    *)
+        echo "Unsupported distribution: $ID"
+        exit 1
+        ;;
+esac
 
 # 显示主菜单
 show_main_menu() {
@@ -66,17 +97,17 @@ show_system_menu() {
     read -p "输入选项编号: " system_choice
 
     case $system_choice in
-        1) echo "更新系统..."; sudo apt update -y && sudo apt upgrade -y ;;
-        2) echo "安装常用工具..."; sudo apt install -y curl wget git vim unzip build-essential net-tools htop traceroute tmux ;;
-        3) echo "安装 Docker..."; sudo apt install -y docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker ;;
-        4) echo "安装开发工具..."; sudo apt install -y python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake ;;
-        5) echo "安装网络工具..."; sudo apt install -y sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping ;;
-        6) echo "安装常用数据库..."; sudo apt install -y mysql-server postgresql redis-server mongodb ;;
-        7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; sudo apt install -y nodejs ;;
-        8) echo "清理不再需要的软件包..."; sudo apt autoremove -y ;;
+        1) echo "更新系统..."; $PKG_UPDATE ;;
+        2) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux ;;
+        3) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker ;;
+        4) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake ;;
+        5) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping ;;
+        6) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb ;;
+        7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs ;;
+        8) echo "清理不再需要的软件包..."; $PKG_REMOVE ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
         10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
-        00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
+        00) curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
             chmod +x linux.sh && \
             sudo mv linux.sh /usr/local/bin/linux-tools && \
             /usr/local/bin/linux-tools ;;
