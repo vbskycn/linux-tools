@@ -72,10 +72,10 @@ esac
 show_main_menu() {
     echo -e "\033[1;33m请选择一个选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 系统相关\033[0m"
-    echo -e "\033[1;37m2. 基础工具\033[0m"
-    echo -e "\033[1;37m3. 脚本大全\033[0m"
-    echo -e "\033[1;37m4. 应用市场\033[0m"
+    echo -e "\033[1;36m1. 系统相关\033[0m"
+    echo -e "\033[1;36m2. 基础工具\033[0m"
+    echo -e "\033[1;36m3. 脚本大全\033[0m"
+    echo -e "\033[1;36m4. 应用市场\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -109,7 +109,7 @@ show_basic_tools_menu() {
     echo -e "\033[1;37m5. 安装常用数据库\033[0m"
     echo -e "\033[1;37m6. 安装 Node.js 和 npm\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;31m0. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " tools_choice
 
@@ -130,17 +130,17 @@ show_system_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m系统相关选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m1. 更新系统\033[0m"
-    echo -e "\033[1;32m2. 清理不再需要的软件包\033[0m"
-    echo -e "\033[1;32m3. 更改系统名\033[0m"
-    echo -e "\033[1;32m4. 设置快捷键 v\033[0m"
-    echo -e "\033[1;32m5. 设置虚拟内存\033[0m"
-    echo -e "\033[1;32m6. 设置SSH端口\033[0m"
-    echo -e "\033[1;32m7. 开放所有端口\033[0m"
-    echo -e "\033[1;32m8. 设置时区为上海\033[0m"
-    echo -e "\033[1;32m9. 自动优化DNS地址\033[0m"
+    echo -e "\033[1;37m1. 更新系统\033[0m"
+    echo -e "\033[1;37m2. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;37m3. 更改系统名\033[0m"
+    echo -e "\033[1;37m4. 设置快捷键 v\033[0m"
+    echo -e "\033[1;37m5. 设置虚拟内存\033[0m"
+    echo -e "\033[1;37m6. 设置SSH端口\033[0m"
+    echo -e "\033[1;37m7. 开放所有端口\033[0m"
+    echo -e "\033[1;37m8. 设置时区为上海\033[0m"
+    echo -e "\033[1;37m9. 自动优化DNS地址\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;31m0. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " system_choice
 
@@ -263,10 +263,10 @@ show_script_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 安装 kejilion 脚本\033[0m"
     echo -e "\033[1;37m2. 安装 勇哥的SB 脚本\033[0m"
-    echo -e "\033[1;37m3. 安装宝塔开行版脚本\033[0m"
+    echo -e "\033[1;37m3. 安装宝塔开心版脚本\033[0m"
     echo -e "\033[1;37m4. 还原到宝塔官方版脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;31m0. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " script_choice
 
@@ -282,60 +282,63 @@ show_script_menu() {
 
 # 应用市场菜单
 show_app_market() {
-    while true; do
-        clear
-        echo -e "\033[1;33m应用市场\033[0m"
-        echo -e "\033[1;34m==============================\033[0m"
-        echo -e "\033[1;37m1. 宝塔面板官方版\033[0m"
-        echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
-        echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
-        echo -e "\033[1;34m==============================\033[0m"
-        echo -e "\033[1;31m0. 返回主菜单\033[0m"
-        echo -e "\033[1;34m==============================\033[0m"
-        read -e -p "请输入你的选择: " sub_choice
+    clear
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m应用市场\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;37m1. 宝塔面板官方版\033[0m"
+    echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
+    echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    read -e -p "请输入你的选择: " sub_choice
 
-        case $sub_choice in
-            1)
-                # 宝塔面板官方版
-                docker_app_install "baota" \
-                    "宝塔面板官方版" \
-                    "8888" \
-                    "wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec" \
-                    "宝塔面板是一款简单好用的服务器运维管理面板" \
-                    "https://www.bt.cn" \
-                    "echo \"" \
-                    "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
-                ;;
-            2)
-                # aaPanel宝塔国际版
-                docker_app_install "aapanel" \
-                    "aaPanel宝塔国际版" \
-                    "7800" \
-                    "wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel" \
-                    "aaPanel是宝塔面板的国际版，没有广告，界面更简洁" \
-                    "https://www.aapanel.com/" \
-                    "echo \"" \
-                    "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
-                ;;
-            3)
-                # 1Panel新一代管理面板
-                docker_app_install "1panel" \
-                    "fit2cloud/1panel" \
-                    "38282" \
-                    "curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh" \
-                    "1Panel是一个现代化、开源的 Linux 服务器运维管理面板" \
-                    "https://1panel.cn/" \
-                    "" \
-                    ""
-                ;;
-            0)
-                break
-                ;;
-            *)
-                echo "无效选项，请重试。"
-                ;;
-        esac
-    done
+    case $sub_choice in
+        1)
+            # 宝塔面板官方版
+            docker_app_install "baota" \
+                "宝塔面板官方版" \
+                "8888" \
+                "wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec" \
+                "宝塔面板是一款简单好用的服务器运维管理面板" \
+                "https://www.bt.cn" \
+                "echo \"" \
+                "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+            show_app_market
+            ;;
+        2)
+            # aaPanel宝塔国际版
+            docker_app_install "aapanel" \
+                "aaPanel宝塔国际版" \
+                "7800" \
+                "wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel" \
+                "aaPanel是宝塔面板的国际版，没有广告，界面更简洁" \
+                "https://www.aapanel.com/" \
+                "echo \"" \
+                "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+            show_app_market
+            ;;
+        3)
+            # 1Panel新一代管理面板
+            docker_app_install "1panel" \
+                "fit2cloud/1panel" \
+                "38282" \
+                "curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh" \
+                "1Panel是一个现代化、开源的 Linux 服务器运维管理面板" \
+                "https://1panel.cn/" \
+                "" \
+                ""
+            show_app_market
+            ;;
+        0)
+            show_main_menu
+            ;;
+        *)
+            echo "无效选项，请重试。"
+            show_app_market
+            ;;
+    esac
 }
 
 # 通用Docker应用安装函数
