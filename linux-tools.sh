@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.9 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.10 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -989,7 +989,7 @@ show_kernel_optimize() {
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓���管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m2. 均衡化模式：       性能与源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m2. 均衡化模式：       性��与源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
@@ -1153,8 +1153,9 @@ configure_root_key_auto() {
     chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
     
     # 修改SSH配置
-    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
     sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
     
     # 重启SSH服务
     systemctl restart sshd > /dev/null 2>&1
@@ -1362,15 +1363,10 @@ enable_root_password() {
         return
     fi
     
-    # 修改 SSH 配置允许 root 登录
-    if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || \
-       ! sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config; then
-        echo "修改SSH配置失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
+    # 修改 SSH 配置允许 root 登录和密码认证
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     
     # 重启 SSH 服务
     if ! systemctl restart sshd; then
@@ -1391,7 +1387,7 @@ enable_root_password() {
         return
     fi
     
-    echo -e "\033[32mroot密码登入已成功启用！\033[0m"
+    echo -e "\033[32mroot登入已成功启用！(支持密码和密钥登入)\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -1464,8 +1460,9 @@ enable_root_key() {
     chmod 644 "$USER_KEY_FILE.pub"
     
     # 修改SSH配置
-    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
     sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
     
     # 重启SSH服务
     if ! systemctl restart sshd; then
