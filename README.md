@@ -77,5 +77,4 @@ github 直连版本
 ```
 curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && chmod +x linux-tools.sh && ./linux-tools.sh
 ```
-
 然后，您可以通过在终端中输入 `v` 来快速启动本地脚本。
