@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.76 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.79 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -158,20 +158,20 @@ show_basic_tools_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m基础工具选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 安装常用工具\033[0m"
-    echo -e "\033[1;37m02. 安装 Docker\033[0m"
-    echo -e "\033[1;37m03. 安装开发工具\033[0m"
-    echo -e "\033[1;37m04. 安装网络工具\033[0m"
-    echo -e "\033[1;37m05. 安装常用数据库\033[0m"
-    echo -e "\033[1;37m06. 安装 Node.js 和 npm\033[0m"
+    echo -e "\033[1;37m1. 安装常用工具\033[0m"
+    echo -e "\033[1;37m2. 安装 Docker\033[0m"
+    echo -e "\033[1;37m3. 安装开发工具\033[0m"
+    echo -e "\033[1;37m4. 安装网络工具\033[0m"
+    echo -e "\033[1;37m5. 安装常用数据库\033[0m"
+    echo -e "\033[1;37m6. 安装 Node.js 和 npm\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m00. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号或代码: " tools_choice
 
     # 如果输入的是纯数字，自动添加tool前缀
     if [[ $tools_choice =~ ^[0-9]+$ ]]; then
-        if [ "$tools_choice" = "00" ]; then
+        if [ "$tools_choice" = "0" ]; then
             show_main_menu
             return
         fi
@@ -183,13 +183,31 @@ show_basic_tools_menu() {
     fi
 
     case $tools_choice in
-        tool01) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
-        tool02) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
-        tool03) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
-        tool04) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
-        tool05) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
-        tool06) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
-        00) show_main_menu ;;
+        tool1) 
+            echo "安装常用工具..."
+            if ! $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; then
+                echo "安装失败，请检查权限或网络连接"
+            else
+                echo "安装完成"
+            fi
+            show_basic_tools_menu 
+            ;;
+        tool2) 
+            echo "安装 Docker..."
+            if ! $PKG_INSTALL docker.io docker-compose; then
+                echo "Docker 安装失败"
+            else
+                sudo systemctl enable docker
+                sudo systemctl start docker
+                echo "Docker 安装完成"
+            fi
+            show_basic_tools_menu 
+            ;;
+        tool3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
+        tool4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
+        tool5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
+        tool6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
     esac
 }
@@ -255,15 +273,22 @@ show_system_menu() {
 update_system() {
     echo "正在更新系统..."
     if [ -f /etc/debian_version ]; then
-        apt update && apt upgrade -y
+        if ! (apt update && apt upgrade -y); then
+            echo "系统更新失败，请检查权限或网络连接"
+        else
+            echo "系统更新完成！"
+        fi
     elif [ -f /etc/redhat-release ]; then
-        yum update -y
+        if ! yum update -y; then
+            echo "系统更新失败，请检查权限或网络连接"
+        else
+            echo "系统更新完成！"
+        fi
     elif [ -f /etc/alpine-release ]; then
         apk update && apk upgrade
     elif [ -f /etc/arch-release ]; then
         pacman -Syu --noconfirm
     fi
-    echo "系统更新完成！"
     show_system_menu
 }
 
@@ -363,23 +388,59 @@ set_swap() {
 
 # 设置SSH端口
 set_ssh_port() {
-    read -p "请输入新的SSH端口号: " new_port
-    sed -i "s/#Port 22/Port $new_port/" /etc/ssh/sshd_config
-    sed -i "s/Port [0-9]*/Port $new_port/" /etc/ssh/sshd_config
-    systemctl restart sshd
-    echo "SSH端口已更改为: $new_port"
+    read -p "请输入新的SSH端口号(1-65535): " new_port
+    
+    # 检查端口号是否有效
+    if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1 ] || [ "$new_port" -gt 65535 ]; then
+        echo "无效的端口号！端口号必须在 1-65535 之间"
+        show_system_menu
+        return
+    }
+    
+    # 检查是否有 root 权限
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要 root 权限来修改 SSH 配置"
+        show_system_menu
+        return
+    }
+    
+    if ! sed -i "s/#Port 22/Port $new_port/" /etc/ssh/sshd_config || \
+       ! sed -i "s/Port [0-9]*/Port $new_port/" /etc/ssh/sshd_config; then
+        echo "修改 SSH 配置失败"
+        show_system_menu
+        return
+    }
+    
+    if ! systemctl restart sshd; then
+        echo "重启 SSH 服务失败"
+    else
+        echo "SSH端口已更改为: $new_port"
+    fi
     show_system_menu
 }
 
 # 开放所有端口
 open_ports() {
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要 root 权限来配置防火墙"
+        show_system_menu
+        return
+    }
+    
     if [ -f /etc/debian_version ]; then
-        apt update
-        apt install -y ufw
+        if ! apt update || ! apt install -y ufw; then
+            echo "安装 ufw 失败"
+            show_system_menu
+            return
+        fi
         ufw allow all
         ufw enable
     elif [ -f /etc/redhat-release ]; then
-        systemctl start firewalld
+        if ! systemctl start firewalld; then
+            echo "启动 firewalld 失败"
+            show_system_menu
+            return
+        fi
         firewall-cmd --zone=public --add-port=1-65535/tcp --permanent
         firewall-cmd --zone=public --add-port=1-65535/udp --permanent
         firewall-cmd --reload
@@ -418,7 +479,7 @@ EOF
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
-# 系统级别的能够打开的文件描述符数量
+# 系统级别的能���打开的文件描述符数量
 fs.file-max = 1000000
 # 单个进程能够打开的文件描述符数量
 fs.nr_open = 1000000
@@ -718,7 +779,7 @@ show_script_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号或代码: " choice
 
-    # 如果输入的是纯数字，自动添加script前缀
+    # 如输入的是纯数字，自动添加script前缀
     if [[ $choice =~ ^[0-9]+$ ]]; then
         if [ "$choice" = "00" ]; then
             show_main_menu
@@ -861,7 +922,7 @@ enable_root_key() {
     chmod 600 "$HOME/id_rsa_root"
     
     echo -e "\033[32mroot密钥登入已配置完成！\033[0m"
-    echo -e "\033[33m私钥文件已保存到：$HOME/id_rsa_root\033[0m"
+    echo -e "\033[33m私钥文件已保存到$HOME/id_rsa_root\033[0m"
     echo -e "\033[33m请妥善保管私钥文件，建议下载后删除服务器上的私钥\033[0m"
     read -n 1 -s -r -p "按任意键继续..."
     echo
