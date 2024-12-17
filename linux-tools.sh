@@ -73,8 +73,9 @@ show_main_menu() {
     echo -e "\033[1;33m请选择一个选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 系统相关\033[0m"
-    echo -e "\033[1;37m2. 脚本大全\033[0m"
-    echo -e "\033[1;37m3. 应用市场\033[0m"
+    echo -e "\033[1;37m2. 基础工具\033[0m"
+    echo -e "\033[1;37m3. 脚本大全\033[0m"
+    echo -e "\033[1;37m4. 应用市场\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -84,8 +85,9 @@ show_main_menu() {
 
     case $main_choice in
         1) show_system_menu ;;
-        2) show_script_menu ;;
-        3) show_app_market ;;
+        2) show_basic_tools_menu ;;
+        3) show_script_menu ;;
+        4) show_app_market ;;
         00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && \
             chmod +x linux-tools.sh && \
             sudo mv linux-tools.sh /usr/local/bin/linux-tools && \
@@ -95,48 +97,63 @@ show_main_menu() {
     esac
 }
 
+# 显示基础工具菜单
+show_basic_tools_menu() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m基础工具选项：\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;37m1. 安装常用工具\033[0m"
+    echo -e "\033[1;37m2. 安装 Docker\033[0m"
+    echo -e "\033[1;37m3. 安装开发工具\033[0m"
+    echo -e "\033[1;37m4. 安装网络工具\033[0m"
+    echo -e "\033[1;37m5. 安装常用数据库\033[0m"
+    echo -e "\033[1;37m6. 安装 Node.js 和 npm\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;31m0. 返回主菜单\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    read -p "输入选项编号: " tools_choice
+
+    case $tools_choice in
+        1) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
+        2) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
+        3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
+        4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
+        5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
+        6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        0) show_main_menu ;;
+        *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
+    esac
+}
+
 # 系统相关菜单
 show_system_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m系统相关选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m1. 更新系统\033[0m"
-    echo -e "\033[1;37m2. 安装常用工具\033[0m"
-    echo -e "\033[1;37m3. 安装 Docker\033[0m"
-    echo -e "\033[1;37m4. 安装开发工具\033[0m"
-    echo -e "\033[1;37m5. 安装网络工具\033[0m"
-    echo -e "\033[1;37m6. 安装常用数据库\033[0m"
-    echo -e "\033[1;37m7. 安装 Node.js 和 npm\033[0m"
-    echo -e "\033[1;32m8. 清理不再需要的软件包\033[0m"
-    echo -e "\033[1;32m9. 更改系统名\033[0m"
-    echo -e "\033[1;32m10. 设置快捷键 v\033[0m"
-    echo -e "\033[1;32m11. 设置虚拟内存\033[0m"
-    echo -e "\033[1;32m12. 设置SSH端口\033[0m"
-    echo -e "\033[1;32m13. 开放所有端口\033[0m"
-    echo -e "\033[1;32m14. 设置系统时区\033[0m"
-    echo -e "\033[1;32m15. 自动优化DNS地址\033[0m"
+    echo -e "\033[1;32m2. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;32m3. 更改系统名\033[0m"
+    echo -e "\033[1;32m4. 设置快捷键 v\033[0m"
+    echo -e "\033[1;32m5. 设置虚拟内存\033[0m"
+    echo -e "\033[1;32m6. 设置SSH端口\033[0m"
+    echo -e "\033[1;32m7. 开放所有端口\033[0m"
+    echo -e "\033[1;32m8. 设置系统时区\033[0m"
+    echo -e "\033[1;32m9. 自动优化DNS地址\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;31m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " system_choice
 
     case $system_choice in
-        1) echo "更新系统..."; $PKG_UPDATE ;;
-        2) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux ;;
-        3) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker ;;
-        4) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake ;;
-        5) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping ;;
-        6) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb ;;
-        7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs ;;
-        8) echo "清理不再需要的软件包..."; $PKG_REMOVE ;;
-        9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
-        10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
-        11) 
+        1) echo "更新系统..."; $PKG_UPDATE; show_system_menu ;;
+        2) echo "清理不再需要的软件包..."; $PKG_REMOVE; show_system_menu ;;
+        3) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname"; show_system_menu ;;
+        4) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'"; show_system_menu ;;
+        5) 
             echo "设置虚拟内存 (默认1G)..."
             read -p "请输入虚拟内存大小（单位：G，直接回车默认1G）: " swap_size
             swap_size=${swap_size:-1}
             
-            # 检查是否已存在swap
             if swapon -s | grep -q "/swapfile"; then
                 echo "检测到已存在虚拟内存，先移除旧的..."
                 sudo swapoff /swapfile
@@ -149,13 +166,13 @@ show_system_menu() {
             sudo mkswap /swapfile
             sudo swapon /swapfile
             
-            # 确保开机自动挂载
             if ! grep -q "/swapfile swap" /etc/fstab; then
                 echo "/swapfile swap swap defaults 0 0" | sudo tee -a /etc/fstab
             fi
-            echo "虚拟内存设置完成！" ;;
+            echo "虚拟内存设置完成！"
+            show_system_menu ;;
             
-        12)
+        6)
             echo "设置SSH端口 (默认5522)..."
             read -p "请输入新的SSH端口号（直接回车默认5522）: " ssh_port
             ssh_port=${ssh_port:-5522}
@@ -176,9 +193,10 @@ show_system_menu() {
             fi
             
             sudo systemctl restart sshd
-            echo "SSH端口已更改为 $ssh_port" ;;
+            echo "SSH端口已更改为 $ssh_port"
+            show_system_menu ;;
             
-        13)
+        7)
             echo "开放所有端口..."
             # 检测系统使用的防火墙
             if command -v ufw >/dev/null 2>&1; then
@@ -191,9 +209,10 @@ show_system_menu() {
             else
                 echo "未检测到支持的防火墙系统"
             fi
-            echo "所有端口已开放，请注意系统安全！" ;;
+            echo "所有端口已开放，请注意系统安全！"
+            show_system_menu ;;
             
-        14)
+        8)
             echo "设置系统时区 (默认Asia/Shanghai)..."
             read -p "请输入时区（直接回车默认Asia/Shanghai）: " timezone
             timezone=${timezone:-"Asia/Shanghai"}
@@ -204,9 +223,10 @@ show_system_menu() {
                 sudo hwclock --systohc
             else
                 echo "时区设置失败，请确认时区名称是否正确"
-            fi ;;
+            fi
+            show_system_menu ;;
             
-        15)
+        9)
             echo "自动优化DNS地址..."
             
             # 获取公网IP
@@ -231,7 +251,8 @@ nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
             
             # 防止DNS被自动覆盖
             sudo chattr +i /etc/resolv.conf
-            echo "DNS设置已完成并已防止自动修改" ;;
+            echo "DNS设置已完成并已防止自动修改"
+            show_system_menu ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
@@ -252,10 +273,10 @@ show_script_menu() {
     read -p "输入选项编号: " script_choice
 
     case $script_choice in
-        1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
-        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
-        3) echo "安装宝塔开心版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
-        4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash ;;
+        1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
+        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
+        3) echo "安装宝塔开心版脚本..."; curl http://io.bt.sy/install/update6.sh|bash; show_script_menu ;;
+        4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash; show_script_menu ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
