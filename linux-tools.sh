@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.74 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.75 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -125,24 +125,25 @@ esac
 
 # 显示主菜单
 show_main_menu() {
+    echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m请选择一个选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;36m1. 系统相关\033[0m"
-    echo -e "\033[1;36m2. 基础工具\033[0m"
-    echo -e "\033[1;36m3. 脚本大全\033[0m"
-    echo -e "\033[1;36m4. 应用市场\033[0m"
+    echo -e "\033[1;36m01. 系统相关 (sys)\033[0m"
+    echo -e "\033[1;36m02. 基础工具 (tool)\033[0m"
+    echo -e "\033[1;36m03. 脚本大全 (script)\033[0m"
+    echo -e "\033[1;36m04. 应用市场 (app)\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;31m0. 退出\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号: " main_choice
+    read -p "输入选项编号或代码: " main_choice
 
     case $main_choice in
-        1) show_system_menu ;;
-        2) show_basic_tools_menu ;;
-        3) show_script_menu ;;
-        4) show_app_market ;;
+        01|sys) show_system_menu ;;
+        02|tool) show_basic_tools_menu ;;
+        03|script) show_script_menu ;;
+        04|app) show_app_market ;;
         00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && \
             chmod +x linux-tools.sh && \
             sudo mv linux-tools.sh /usr/local/bin/linux-tools && \
@@ -155,26 +156,39 @@ show_main_menu() {
 # 显示基础工具菜单
 show_basic_tools_menu() {
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33m基础工具选项：\033[0m"
+    echo -e "\033[1;33m基础工具选项 (tool)：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 安装常用工具\033[0m"
-    echo -e "\033[1;37m02. 安装 Docker\033[0m"
-    echo -e "\033[1;37m03. 安装开发工具\033[0m"
-    echo -e "\033[1;37m04. 安装网络工具\033[0m"
-    echo -e "\033[1;37m05. 安装常用数据库\033[0m"
-    echo -e "\033[1;37m06. 安装 Node.js 和 npm\033[0m"
+    echo -e "\033[1;37mtool01. 安装常用工具\033[0m"
+    echo -e "\033[1;37mtool02. 安装 Docker\033[0m"
+    echo -e "\033[1;37mtool03. 安装开发工具\033[0m"
+    echo -e "\033[1;37mtool04. 安装网络工具\033[0m"
+    echo -e "\033[1;37mtool05. 安装常用数据库\033[0m"
+    echo -e "\033[1;37mtool06. 安装 Node.js 和 npm\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号: " tools_choice
+    read -p "输入选项编号或代码: " tools_choice
+
+    # 如果输入的是纯数字，自动添加tool前缀
+    if [[ $tools_choice =~ ^[0-9]+$ ]]; then
+        if [ "$tools_choice" = "00" ]; then
+            show_main_menu
+            return
+        fi
+        # 将个位数转换为两位数格式
+        if [ ${#tools_choice} -eq 1 ]; then
+            tools_choice="0$tools_choice"
+        fi
+        tools_choice="tool$tools_choice"
+    fi
 
     case $tools_choice in
-        01) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
-        02) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
-        03) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
-        04) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
-        05) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
-        06) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        tool01) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
+        tool02) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
+        tool03) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
+        tool04) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
+        tool05) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
+        tool06) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
         00) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
     esac
@@ -184,42 +198,54 @@ show_basic_tools_menu() {
 show_system_menu() {
     clear
     echo "=============================="
-    echo "系统相关选项："
+    echo "系统相关选项 (sys)："
     echo "=============================="
-    echo "01. 更新系统"
-    echo "02. 清理不再需要的软件包"
-    echo "03. 更改系统名"
-    echo "04. 设置快捷键 v"
-    echo "05. 设置虚拟内存"
-    echo "06. 设置SSH端口"
-    echo "07. 开放所有端口"
-    echo "08. 设置时区为上海"
-    echo "09. 自动优化DNS地址"
-    echo "10. 系统内核优化"
-    echo "11. 开启root密码登入"
-    echo "12. 开启root密钥登入"
+    echo "sys01. 更新系统"
+    echo "sys02. 清理不再需要的软件包"
+    echo "sys03. 更改系统名"
+    echo "sys04. 设置快捷键 v"
+    echo "sys05. 设置虚拟内存"
+    echo "sys06. 设置SSH端口"
+    echo "sys07. 开放所有端口"
+    echo "sys08. 设置时区为上海"
+    echo "sys09. 自动优化DNS地址"
+    echo "sys10. 系统内核优化"
+    echo "sys11. 开启root密码登入"
+    echo "sys12. 开启root密钥登入"
     echo "=============================="
     echo "0. 返回主菜单"
     echo "=============================="
-    read -p "输入选项编号: " choice
+    read -p "输入选项编号或代码: " choice
+
+    # 如果输入的是纯数字，自动添加sys前缀
+    if [[ $choice =~ ^[0-9]+$ ]]; then
+        if [ "$choice" = "00" ]; then
+            show_main_menu
+            return
+        fi
+        # 将个位数转换为两位数格式
+        if [ ${#choice} -eq 1 ]; then
+            choice="0$choice"
+        fi
+        choice="sys$choice"
+    fi
 
     case $choice in
-        1) update_system ;;
-        2) clean_packages ;;
-        3) change_hostname ;;
-        4) set_shortcut ;;
-        5) set_swap ;;
-        6) set_ssh_port ;;
-        7) open_ports ;;
-        8) set_timezone ;;
-        9) optimize_dns ;;
-        10) show_kernel_optimize ;;
-        11) enable_root_password ;;
-        12) enable_root_key ;;
+        sys01) update_system ;;
+        sys02) clean_packages ;;
+        sys03) change_hostname ;;
+        sys04) set_shortcut ;;
+        sys05) set_swap ;;
+        sys06) set_ssh_port ;;
+        sys07) open_ports ;;
+        sys08) set_timezone ;;
+        sys09) optimize_dns ;;
+        sys10) show_kernel_optimize ;;
+        sys11) enable_root_password ;;
+        sys12) enable_root_key ;;
         0) show_main_menu ;;
-        *) 
-            echo "无效选项"
-            sleep 1
+        *)
+            echo "无效选项，请重试。"
             show_system_menu
             ;;
     esac
@@ -683,18 +709,31 @@ show_kernel_optimize() {
 show_script_menu() {
     clear
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33m脚本大全：\033[0m"
+    echo -e "\033[1;33m脚本大全 (script)：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 安装 kejilion 脚本\033[0m"
-    echo -e "\033[1;37m02. 安装 勇哥的SB 脚本\033[0m"
+    echo -e "\033[1;37mscript01. 安装 kejilion 脚本\033[0m"
+    echo -e "\033[1;37mscript02. 安装 勇哥的SB 脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号: " choice
+    read -p "输入选项编号或代码: " choice
+
+    # 如果输入的是纯数字，自动添加script前缀
+    if [[ $choice =~ ^[0-9]+$ ]]; then
+        if [ "$choice" = "00" ]; then
+            show_main_menu
+            return
+        fi
+        # 将个位数转换为两位数格式
+        if [ ${#choice} -eq 1 ]; then
+            choice="0$choice"
+        fi
+        choice="script$choice"
+    fi
 
     case $choice in
-        01) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
-        02) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
+        script01) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
+        script02) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
         00) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
@@ -704,35 +743,48 @@ show_script_menu() {
 show_app_market() {
     clear
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33m应用市场\033[0m"
+    echo -e "\033[1;33m应用市场 (app)：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 宝塔面板官方版\033[0m"
-    echo -e "\033[1;37m02. aaPanel宝塔国际版\033[0m"
-    echo -e "\033[1;37m03. 1Panel新一代管理面板\033[0m"
-    echo -e "\033[1;37m04. 安装宝塔开心版\033[0m"
-    echo -e "\033[1;37m05. 还原到宝塔官方版\033[0m"
+    echo -e "\033[1;37mapp01. 宝塔面板官方版\033[0m"
+    echo -e "\033[1;37mapp02. aaPanel宝塔国际版\033[0m"
+    echo -e "\033[1;37mapp03. 1Panel新一代管理面板\033[0m"
+    echo -e "\033[1;37mapp04. 安装宝塔开心版\033[0m"
+    echo -e "\033[1;37mapp05. 还原到宝塔官方版\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -e -p "请输入你的选择: " choice
+    read -e -p "请输入选项编号或代码: " choice
+
+    # 如果输入的是纯数字，自动添加app前缀
+    if [[ $choice =~ ^[0-9]+$ ]]; then
+        if [ "$choice" = "00" ]; then
+            show_main_menu
+            return
+        fi
+        # 将个位数转换为两位数格式
+        if [ ${#choice} -eq 1 ]; then
+            choice="0$choice"
+        fi
+        choice="app$choice"
+    fi
 
     case $choice in
-        01)
+        app01)
             echo "安装宝塔面板官方版..."
             wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
             show_app_market
             ;;
-        02)
+        app02)
             echo "安装aaPanel宝塔国际版..."
             wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel
             show_app_market
             ;;
-        03)
+        app03)
             echo "安装1Panel新一代管理面板..."
             curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh
             show_app_market
             ;;
-        04)
+        app04)
             # 检查是否已安装宝塔面板
             if [ ! -f "/etc/init.d/bt" ]; then
                 echo -e "\033[33m未检测到宝塔面板，正在安装官方版...\033[0m"
@@ -745,7 +797,7 @@ show_app_market() {
             curl http://io.bt.sy/install/update6.sh|bash
             show_app_market
             ;;
-        05)
+        app05)
             echo "还原到宝塔官方版..."
             curl http://download.bt.cn/install/update6.sh|bash
             show_app_market
