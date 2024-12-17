@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.83 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.84 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -44,7 +44,7 @@ fi
 
 show_toolbox_info
 
-# 检查并复制脚本到系统程序目��
+# 检查并复制脚本到系统程序目录
 install_script() {
     # 获取脚本的绝对路径
     SCRIPT_PATH=$(readlink -f "$0")
@@ -311,7 +311,7 @@ clean_packages() {
 
 # 更改系统名
 change_hostname() {
-    read -p "请���入新的主机名: " new_hostname
+    read -p "请输入新的主机名: " new_hostname
     hostnamectl set-hostname $new_hostname
     echo "系统名已更改为: $new_hostname"
     show_system_menu
@@ -357,7 +357,7 @@ set_swap() {
         echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     fi
     
-    echo "���拟内存设置完成！"
+    echo "虚拟内存设置完成！"
     show_system_menu
 }
 
@@ -426,7 +426,7 @@ open_ports() {
 
 # 设置时区为上海
 set_timezone() {
-    echo "正在设置时区为���海..."
+    echo "正在设置时区为上海..."
     if ! sudo timedatectl set-timezone Asia/Shanghai; then
         echo "设置时区失败"
     else
@@ -481,7 +481,7 @@ kernel.threads-max = 30000
 # 允许更多的网络连接
 net.core.somaxconn = 65535
 net.core.netdev_max_backlog = 65535
-# 调整络缓冲区大���
+# 调整络缓冲区大小
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
 net.core.wmem_default = 262144
@@ -857,7 +857,7 @@ enable_root_password() {
     echo -e "\033[33m请设置root用户密码...\033[0m"
     sudo passwd root
     
-    echo -e "\033[32mroot密码登入已开启！\033[0m"
+    echo -e "\033[32mroot密码登入已��启！\033[0m"
     read -n 1 -s -r -p "按任意键继续..."
     echo
     show_system_menu
