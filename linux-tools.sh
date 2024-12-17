@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.1 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.2 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -206,7 +206,7 @@ set_shortcut() {
     echo "正在设置快捷键..."
     
     # 定义要添加的别名命令
-    ALIAS_CMD='alias v="bash <(curl -Ls https://raw.githubusercontent.com/kejilion/linux-tools/main/linux-tools.sh)"'
+    ALIAS_CMD='alias v="/usr/local/bin/linux-tools"'
     
     # 检查各种可能的配置文件
     CONFIG_FILES=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.zshrc")
@@ -747,7 +747,7 @@ docker_app_install() {
         echo "------------------------"
         echo "0. 返回上一级"
         echo "------------------------"
-        read -e -p "输入你的选择: " choice
+        read -e -p "请输入你的选择: " choice
 
         case $choice in
             1)
