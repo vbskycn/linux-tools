@@ -204,9 +204,60 @@ change_hostname() {
 # 设置快捷键
 set_shortcut() {
     echo "正在设置快捷键..."
-    echo 'alias v="bash <(curl -Ls https://raw.githubusercontent.com/kejilion/linux-tools/main/linux-tools.sh)"' >> ~/.bashrc
-    source ~/.bashrc
-    echo "快捷键设置完成！现在可以使用 v 命令快速启动脚本。"
+    
+    # 定义要添加的别名命令
+    ALIAS_CMD='alias v="bash <(curl -Ls https://raw.githubusercontent.com/kejilion/linux-tools/main/linux-tools.sh)"'
+    
+    # 检查各种可能的配置文件
+    CONFIG_FILES=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.zshrc")
+    
+    # 标记是否成功设置
+    SUCCESS=false
+    
+    for config_file in "${CONFIG_FILES[@]}"; do
+        if [ -f "$config_file" ]; then
+            # 检查是否已存在v的别名，如果存在则删除
+            sed -i '/^alias v=/d' "$config_file"
+            
+            # 添加新的别名
+            echo "$ALIAS_CMD" >> "$config_file"
+            
+            # 立即生效
+            source "$config_file" 2>/dev/null || true
+            
+            echo "已在 $config_file 中设置快捷键"
+            SUCCESS=true
+        fi
+    done
+    
+    # 如果没有找到任何配置文件，创建 .bashrc
+    if [ "$SUCCESS" = false ]; then
+        echo "$ALIAS_CMD" >> "$HOME/.bashrc"
+        source "$HOME/.bashrc" 2>/dev/null || true
+        echo "已创建并设置 $HOME/.bashrc"
+        SUCCESS=true
+    fi
+    
+    # 验证设置是否成功
+    if type v >/dev/null 2>&1; then
+        echo -e "\033[32m快捷键设置成功！\033[0m"
+        echo "现在可以使用 v 命令快速启动脚本"
+        echo "提示：如果当前终端中 v 命令不可用，请重新打开终端或执行 source ~/.bashrc"
+    else
+        echo -e "\033[31m快捷键设置可能未生效，请尝试以下方法：\033[0m"
+        echo "1. 重新打开终端"
+        echo "2. 手动执行: source ~/.bashrc"
+        echo "3. 重新登录系统"
+    fi
+    
+    # 添加到 /etc/profile 以使所有用户都可以使用
+    if [ "$(id -u)" = "0" ]; then
+        echo "$ALIAS_CMD" >> /etc/profile
+        echo "已添加到系统级配置，所有用户都可以使用此快捷键"
+    fi
+    
+    read -n 1 -s -r -p "按任意键继续..."
+    echo
     show_system_menu
 }
 
