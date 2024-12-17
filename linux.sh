@@ -80,6 +80,9 @@ install_script() {
         echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
         echo "快捷命令 'v' 已添加。"
     fi
+    if ! grep -q "source ~/.bashrc" ~/.bash_profile; then
+        echo "if [ -f ~/.bashrc ]; then source ~/.bashrc; fi" >> ~/.bash_profile
+    fi
     source ~/.bashrc
     echo "快捷命令 'v' 已生效。"
     echo "Finished install_script function."
