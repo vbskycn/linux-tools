@@ -260,55 +260,43 @@ set_shortcut() {
     # 定义要添加的别名命令
     ALIAS_CMD='alias v="/usr/local/bin/linux-tools"'
     
-    # 检查各种可能的配置文件
-    CONFIG_FILES=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.zshrc")
-    
-    # 标记是否成功设置
-    SUCCESS=false
-    
-    for config_file in "${CONFIG_FILES[@]}"; do
-        if [ -f "$config_file" ]; then
-            # 检查是否已存在v的别名，如果存在则删除
-            sed -i '/^alias v=/d' "$config_file"
-            
-            # 添加新的别名
-            echo "$ALIAS_CMD" >> "$config_file"
-            echo "已在 $config_file 中设置快捷键"
-            SUCCESS=true
-        fi
-    done
-    
-    # 如果没有找到任何配置文件，创建 .bashrc
-    if [ "$SUCCESS" = false ]; then
-        echo "$ALIAS_CMD" >> "$HOME/.bashrc"
-        echo "已创建并设置 $HOME/.bashrc"
-        SUCCESS=true
+    # 首先确保脚本已经被正确安装到系统目录
+    if [ ! -f "/usr/local/bin/linux-tools" ]; then
+        sudo cp "$(readlink -f "$0")" /usr/local/bin/linux-tools
+        sudo chmod +x /usr/local/bin/linux-tools
     fi
     
-    # 添加到 /etc/profile 以使所有用户都可以使用
+    # 设置用户级别的别名
+    if [ -f "$HOME/.bashrc" ]; then
+        # 移除旧的别名配置
+        sed -i '/^alias.*v=.*linux-tools.*/d' "$HOME/.bashrc"
+        # 添加新的别名
+        echo "$ALIAS_CMD" >> "$HOME/.bashrc"
+        echo "已在 $HOME/.bashrc 中设置快捷键"
+    fi
+    
+    # 确保 .bash_profile 加载 .bashrc
+    if [ -f "$HOME/.bash_profile" ]; then
+        if ! grep -q "source.*\.bashrc" "$HOME/.bash_profile"; then
+            echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' >> "$HOME/.bash_profile"
+        fi
+        echo "已在 $HOME/.bash_profile 中设置快捷键"
+    fi
+    
+    # 设置系统级别的别名（如果是root用户）
     if [ "$(id -u)" = "0" ]; then
-        # 检查是否已存在v的别名，如果存在则删除
-        sed -i '/^alias v=/d' /etc/profile
-        echo "$ALIAS_CMD" >> /etc/profile
+        # 在 /etc/profile.d/ 创建一个专门的别名文件
+        echo "$ALIAS_CMD" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+        sudo chmod +x /etc/profile.d/linux-tools-alias.sh
         echo "已添加到系统级配置，所有用户都可以使用此快捷键"
     fi
     
     # 立即生效别名
     eval "$ALIAS_CMD"
     
-    # 验证设置是否成功
-    if type v >/dev/null 2>&1; then
-        echo -e "\033[32m快捷键设置成功并已生效！\033[0m"
-        echo "现在可以使用 v 命令快速启动脚本"
-        echo -e "\033[33m注意：在新终端中使用快捷键可能需要：\033[0m"
-        echo "1. 重新打开终端"
-        echo "2. 或执行: source ~/.bashrc"
-    else
-        echo -e "\033[31m快捷键设置遇到问题，请尝试以下方法：\033[0m"
-        echo "1. 手动执行: source ~/.bashrc"
-        echo "2. 重新打开终端"
-        echo "3. 重新登录系统"
-    fi
+    echo -e "\033[32m快捷键设置完成！\033[0m"
+    echo "请执行以下命令使快捷键立即生效："
+    echo -e "\033[33msource ~/.bashrc\033[0m"
     
     read -n 1 -s -r -p "按任意键继续..."
     echo
