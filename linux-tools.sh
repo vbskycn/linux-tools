@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.7 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.8 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -503,7 +503,7 @@ set_swap() {
     if ! sudo chmod 600 /swapfile; then
         echo "设置权限失败"
         sudo rm -f /swapfile
-        echo -e "\033[1;32m按任意键返回...\033[0m"
+        echo -e "\033[1;32m��任意键返回...\033[0m"
         read -n 1
         show_system_menu
         return
@@ -552,7 +552,7 @@ set_ssh_port() {
     fi
     echo "当前SSH端口: $current_port"
     
-    # 提示用户输入新端口，默认为5522
+    # 提示用户输入新端口，默��为5522
     read -p "请输入新的SSH端口号(1-65535) [默认: 5522]: " new_port
     new_port=${new_port:-5522}  # 如果用户直接回车，使用默认值5522
     
@@ -719,7 +719,7 @@ nameserver 223.5.5.5
 nameserver 114.114.114.114
 EOF
     else
-        echo "检测到服务器在国外，���用国际DNS..."
+        echo "检测到服务器在国外，使用国际DNS..."
         cat > /etc/resolv.conf << EOF
 nameserver 1.1.1.1
 nameserver 8.8.8.8
@@ -992,7 +992,7 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓���管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡化模式：       性能与源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
@@ -1125,152 +1125,48 @@ show_app_market() {
     esac
 }
 
-# 开启root密码登入
-enable_root_password() {
-    echo "正在配置root密码登入..."
-    
-    # 检查是否有root权限
-    if [ "$(id -u)" != "0" ]; then
-        echo "需要root权限来修改配置"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
-    # 修改 SSH 配置允许 root 登录
-    if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || \
-       ! sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config; then
-        echo "修改SSH配置失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
-    # 重启 SSH 服务
-    if ! systemctl restart sshd; then
-        echo "重启SSH服务失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
-    # 设置root密码
-    echo -e "\033[33m请设置root用户密码...\033[0m"
-    if ! passwd root; then
-        echo "设置root密码失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
-    echo -e "\033[32mroot密码登入已成功启用！\033[0m"
-    echo -e "\033[1;32m按任意键返回...\033[0m"
-    read -n 1
-    show_system_menu
-}
-
-# 开启root密钥登入
-enable_root_key() {
-    echo "正在配置root���钥登入..."
-    
-    # 检查是否有root权限
-    if [ "$(id -u)" != "0" ]; then
-        echo "需要root权限来修改配置"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
-    # 获取真实的登录用户（通过SSH_CLIENT或SSH_TTY判断）
-    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-        REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
-    fi
-    
-    # 如果上面的方法失败，尝试其他方法
-    if [ -z "$REAL_USER" ]; then
-        REAL_USER=$SUDO_USER
-    fi
-    if [ -z "$REAL_USER" ]; then
-        REAL_USER=$(who am i | awk '{print $1}')
-    fi
-    
-    # 如果无法获取真实用户，就使用当前用户
-    if [ -z "$REAL_USER" ]; then
-        REAL_USER=$(whoami)
-    fi
-    
-    # 获取用户的家目录
+# ���加一个新的非交互式密钥配置函数
+configure_root_key_auto() {
+    # 获取真实用户信息
+    REAL_USER=${SUDO_USER:-$(who am i | awk '{print $1}')}
+    REAL_USER=${REAL_USER:-$(whoami)}
     REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
-    if [ -z "$REAL_HOME" ]; then
-        REAL_HOME=$HOME
-    fi
+    REAL_HOME=${REAL_HOME:-$HOME}
     
     # 设置密钥文件路径
-    KEY_FILE="/root/.ssh/id_rsa_root"
-    USER_KEY_FILE="$REAL_HOME/.ssh/id_rsa_root"
+    KEY_FILE="/root/.ssh/id_ed25519_root"
+    USER_KEY_FILE="$REAL_HOME/.ssh/id_ed25519_root"
     
-    # 创建用户的.ssh目录
-    if ! mkdir -p "$REAL_HOME/.ssh"; then
-        echo "创建用户的SSH目录失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
+    # 创建必要的目录
+    mkdir -p /root/.ssh "$REAL_HOME/.ssh"
     
-    # 设置正确的权限
-    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
-    chmod 700 "$REAL_HOME/.ssh"
-    
-    # 生成新的密钥对
-    echo "正在生成新的SSH密钥对..."
-    if ! ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q; then
-        echo "生成SSH密钥对失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
+    # 生成ED25519密钥对
+    ssh-keygen -t ed25519 -f "$KEY_FILE" -N "" -q -C "root@$(hostname)"
     
     # 配置root的authorized_keys
-    mkdir -p /root/.ssh
-    chmod 700 /root/.ssh
     cat "$KEY_FILE.pub" > /root/.ssh/authorized_keys
-    chmod 600 /root/.ssh/authorized_keys
     
     # 复制密钥到用户目录
     cp "$KEY_FILE" "$USER_KEY_FILE"
     cp "$KEY_FILE.pub" "$USER_KEY_FILE.pub"
-    chown "$REAL_USER:$REAL_USER" "$USER_KEY_FILE"*
-    chmod 600 "$USER_KEY_FILE"
+    
+    # 设置正确的权限
+    chmod 700 /root/.ssh "$REAL_HOME/.ssh"
+    chmod 600 /root/.ssh/authorized_keys "$USER_KEY_FILE"
     chmod 644 "$USER_KEY_FILE.pub"
+    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
     
     # 修改SSH配置
     sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
     sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     
     # 重启SSH服务
-    if ! systemctl restart sshd; then
-        echo "重启SSH服务失败"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
+    systemctl restart sshd > /dev/null 2>&1
     
-    echo -e "\033[32mroot密钥登入配置成功！\033[0m"
-    echo -e "\033[33m密钥文件已保存到:\033[0m"
-    echo -e "\033[33m私钥: $USER_KEY_FILE\033[0m"
-    echo -e "\033[33m公钥: $USER_KEY_FILE.pub\033[0m"
-    echo -e "\033[33m请下载私钥文件后删除服务器上的私钥\033[0m"
-    echo -e "\033[1;32m按任意键返回...\033[0m"
-    read -n 1
-    show_system_menu
+    # 输出密钥位置信息到日志
+    echo "Root SSH密钥已配置完成" >> "$LOG_FILE"
+    echo "私钥位置: $USER_KEY_FILE" >> "$LOG_FILE"
+    echo "公钥位置: $USER_KEY_FILE.pub" >> "$LOG_FILE"
 }
 
 # 添加自用服务器开箱函数
@@ -1293,7 +1189,7 @@ server_init() {
     echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
     echo -e "\033[1;37m11. 设置时区为上海\033[0m"
     echo -e "\033[1;37m12. 优化DNS配置\033[0m"
-    echo -e "\033[1;37m13. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;37m13. 清理不���需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置。\033[0m"
     
     # 自动确认，无需用户交互
@@ -1386,7 +1282,7 @@ server_init() {
     
     # 8. 配置root密钥登入
     echo -e "\n\033[1;32m[8/13] 配置root密钥登入...\033[0m"
-    enable_root_key > /dev/null 2>&1
+    configure_root_key_auto
     
     # 9. 设置虚拟内存
     echo -e "\n\033[1;32m[9/13] 设置虚拟内存(2GB)...\033[0m"
@@ -1452,6 +1348,144 @@ EOF
 
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;33m请查看日志文件了解详细信息：$LOG_FILE\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
+    show_system_menu
+}
+
+# 添加开启root密码登入功能
+enable_root_password() {
+    echo "正在配置root密码登入..."
+    
+    # 检查是否有root权限
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要root权限来修改配置"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 修改 SSH 配置允许 root 登录
+    if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || \
+       ! sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config; then
+        echo "修改SSH配置失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 重启 SSH 服务
+    if ! systemctl restart sshd; then
+        echo "重启SSH服务失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 设置root密码
+    echo -e "\033[33m请设置root用户密码...\033[0m"
+    if ! passwd root; then
+        echo "设置root密码失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    echo -e "\033[32mroot密码登入已成功启用！\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
+    show_system_menu
+}
+
+# 添加开启root密钥登入功能
+enable_root_key() {
+    echo "正在配置root密钥登入..."
+    
+    # 检查是否有root权限
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要root权限来修改配置"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 获取真实的登录用户
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
+    fi
+    
+    if [ -z "$REAL_USER" ]; then
+        REAL_USER=$SUDO_USER
+    fi
+    if [ -z "$REAL_USER" ]; then
+        REAL_USER=$(who am i | awk '{print $1}')
+    fi
+    if [ -z "$REAL_USER" ]; then
+        REAL_USER=$(whoami)
+    fi
+    
+    # 获取用户的家目录
+    REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+    if [ -z "$REAL_HOME" ]; then
+        REAL_HOME=$HOME
+    fi
+    
+    # 设置密钥文件路径
+    KEY_FILE="/root/.ssh/id_ed25519_root"
+    USER_KEY_FILE="$REAL_HOME/.ssh/id_ed25519_root"
+    
+    # 创建必要的目录
+    mkdir -p "$REAL_HOME/.ssh"
+    chmod 700 "$REAL_HOME/.ssh"
+    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
+    
+    # 生成ED25519密钥对
+    echo "正在生成新的SSH密钥对(ED25519)..."
+    if ! ssh-keygen -t ed25519 -f "$KEY_FILE" -N "" -q -C "root@$(hostname)"; then
+        echo "生成SSH密钥对失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 配置root的authorized_keys
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+    cat "$KEY_FILE.pub" > /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+    
+    # 复制密钥到用户目录
+    cp "$KEY_FILE" "$USER_KEY_FILE"
+    cp "$KEY_FILE.pub" "$USER_KEY_FILE.pub"
+    chown "$REAL_USER:$REAL_USER" "$USER_KEY_FILE"*
+    chmod 600 "$USER_KEY_FILE"
+    chmod 644 "$USER_KEY_FILE.pub"
+    
+    # 修改SSH配置
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    
+    # 重启SSH服务
+    if ! systemctl restart sshd; then
+        echo "重启SSH服务失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    echo -e "\033[32mroot密钥登入配置成功！\033[0m"
+    echo -e "\033[33m密钥文件已保存到:\033[0m"
+    echo -e "\033[33m私钥: $USER_KEY_FILE\033[0m"
+    echo -e "\033[33m公钥: $USER_KEY_FILE.pub\033[0m"
+    echo -e "\033[33m请下载私钥文件后删除服务器上的私钥\033[0m"
+    echo -e "\033[33m使用方法: ssh -i <私钥文件路径> -p <SSH端口> root@<服务器IP>\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
