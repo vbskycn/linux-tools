@@ -24,7 +24,7 @@
 ## 更新说明
 
 - 所有 `https://raw.githubusercontent.com` 链接已更改为通过代理服务器 `https://github.zhoujie218.top/https://raw.githubusercontent.com` 访问，以提高网络可访问性。
-- 脚本现在会下载到本地，并设置快捷键 `v` 来运行本地的 `linux.sh`。
+- 脚本现在会下载到本地，并设置快捷键 `v` 来运行本地的 `linux-tools.sh`。
 
 ## 使用方法
 
@@ -33,11 +33,11 @@
 
 github 代理版本
 ```
-curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux.sh && chmod +x linux.sh && ./linux.sh
+curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux-tools.sh && chmod +x linux-tools.sh && ./linux-tools.sh
 ```
 github 直连版本
 ```
-curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && ./linux.sh
+curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && chmod +x linux-tools.sh && ./linux-tools.sh
 ```
 
 然后，您可以通过在终端中输入 `v` 来快速启动本地脚本。

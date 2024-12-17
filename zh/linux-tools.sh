@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux Tools 脚本工具箱 v1.23 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.23 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -22,14 +22,14 @@ echo -e "\033[1;34m==============================\033[0m"
 
 # 自动更新脚本到 /usr/local/bin/
 if [ "$0" != "/usr/local/bin/linux-tools" ]; then
-    curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh
-    chmod +x linux.sh
-    if ! diff linux.sh /usr/local/bin/linux-tools > /dev/null 2>&1; then
+    curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux-tools.sh
+    chmod +x linux-tools.sh
+    if ! diff linux-tools.sh /usr/local/bin/linux-tools > /dev/null 2>&1; then
         echo "脚本有更新，覆盖到 /usr/local/bin/..."
-        sudo mv linux.sh /usr/local/bin/linux-tools
+        sudo mv linux-tools.sh /usr/local/bin/linux-tools
     else
         echo "脚本已是最新版本。"
-        rm linux.sh
+        rm linux-tools.sh
     fi
     exec /usr/local/bin/linux-tools "$@"
     exit
@@ -84,9 +84,9 @@ show_main_menu() {
     case $main_choice in
         1) show_system_menu ;;
         2) show_script_menu ;;
-        00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
-            chmod +x linux.sh && \
-            sudo mv linux.sh /usr/local/bin/linux-tools && \
+        00) curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux-tools.sh && \
+            chmod +x linux-tools.sh && \
+            sudo mv linux-tools.sh /usr/local/bin/linux-tools && \
             /usr/local/bin/linux-tools ;;
         0) exit 0 ;;
         *) echo "无效选项，请重试。"; show_main_menu ;;
@@ -144,8 +144,8 @@ show_script_menu() {
     read -p "输入选项编号: " script_choice
 
     case $script_choice in
-        1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
-        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
+        1) echo "安装 kejilion 脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
+        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://github.zhoujie218.top/https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
         3) echo "安装宝塔开行版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
         4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash ;;
         0) show_main_menu ;;
