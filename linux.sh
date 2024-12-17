@@ -1,14 +1,24 @@
 #!/bin/bash
 
+# 显示脚本工具箱信息
+show_toolbox_info() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.0 只为更简单的Linux的使用！\033[0m"
+    echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
+    echo -e "\033[1;32m-输入v可快速启动此脚本-\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+}
+
 # 自动更新脚本到 /usr/local/bin/
 if [ "$0" != "/usr/local/bin/linux-tools" ]; then
-    echo "更新脚本到 /usr/local/bin/..."
     curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh
     chmod +x linux.sh
     sudo mv linux.sh /usr/local/bin/linux-tools
     exec /usr/local/bin/linux-tools "$@"
     exit
 fi
+
+show_toolbox_info
 
 # 显示主菜单
 show_main_menu() {
@@ -121,6 +131,4 @@ install_script() {
 install_script
 
 # 启动菜单
-echo "Starting main menu..."
 show_main_menu
-echo "Exiting script."
