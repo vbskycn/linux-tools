@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.72 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.73 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -157,25 +157,25 @@ show_basic_tools_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m基础工具选项：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 安装常用工具\033[0m"
-    echo -e "\033[1;37m2. 安装 Docker\033[0m"
-    echo -e "\033[1;37m3. 安装开发工具\033[0m"
-    echo -e "\033[1;37m4. 安装网络工具\033[0m"
-    echo -e "\033[1;37m5. 安装常用数据库\033[0m"
-    echo -e "\033[1;37m6. 安装 Node.js 和 npm\033[0m"
+    echo -e "\033[1;37m01. 安装常用工具\033[0m"
+    echo -e "\033[1;37m02. 安装 Docker\033[0m"
+    echo -e "\033[1;37m03. 安装开发工具\033[0m"
+    echo -e "\033[1;37m04. 安装网络工具\033[0m"
+    echo -e "\033[1;37m05. 安装常用数据库\033[0m"
+    echo -e "\033[1;37m06. 安装 Node.js 和 npm\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m0. 返回主菜单\033[0m"
+    echo -e "\033[1;32m00. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号: " tools_choice
 
     case $tools_choice in
-        1) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
-        2) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
-        3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
-        4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
-        5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
-        6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
-        0) show_main_menu ;;
+        01) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
+        02) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker; show_basic_tools_menu ;;
+        03) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
+        04) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
+        05) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
+        06) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        00) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
     esac
 }
@@ -186,15 +186,15 @@ show_system_menu() {
     echo "=============================="
     echo "系统相关选项："
     echo "=============================="
-    echo "1. 更新系统"
-    echo "2. 清理不再需要的软件包"
-    echo "3. 更改系统名"
-    echo "4. 设置快捷键 v"
-    echo "5. 设置虚拟内存"
-    echo "6. 设置SSH端口"
-    echo "7. 开放所有端口"
-    echo "8. 设置时区为上海"
-    echo "9. 自动优化DNS地址"
+    echo "01. 更新系统"
+    echo "02. 清理不再需要的软件包"
+    echo "03. 更改系统名"
+    echo "04. 设置快捷键 v"
+    echo "05. 设置虚拟内存"
+    echo "06. 设置SSH端口"
+    echo "07. 开放所有端口"
+    echo "08. 设置时区为上海"
+    echo "09. 自动优化DNS地址"
     echo "10. 系统内核优化"
     echo "11. 开启root密码登入"
     echo "12. 开启root密钥登入"
