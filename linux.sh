@@ -107,7 +107,7 @@ show_system_menu() {
         8) echo "清理不再需要的软件包..."; $PKG_REMOVE ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
         10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
-        00) curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
+        00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
             chmod +x linux.sh && \
             sudo mv linux.sh /usr/local/bin/linux-tools && \
             /usr/local/bin/linux-tools ;;
