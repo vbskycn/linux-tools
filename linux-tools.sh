@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.6 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.7 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -638,11 +638,6 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m视频介绍: https://www.bilibili.com/video/BV1Kb421J7yg?t=0.1\033[0m"
-    echo -e "\033[1;34m------------------------------------------------\033[0m"
-    echo -e "\033[1;37m提供多种系统参数调优模式，用户可以根据自身使用场景进行选择切换。\033[0m"
-    echo -e "\033[1;33m提示: \033[1;37m生产环境请谨慎使用！\033[0m"
-    echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对网站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
@@ -686,23 +681,20 @@ show_kernel_optimize() {
 
 # 脚本大全菜单
 show_script_menu() {
+    clear
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m脚本大全：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 安装 kejilion 脚本\033[0m"
     echo -e "\033[1;37m2. 安装 勇哥的SB 脚本\033[0m"
-    echo -e "\033[1;37m3. 安装宝塔开心版脚本\033[0m"
-    echo -e "\033[1;37m4. 还原到宝塔官方版脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号: " script_choice
+    read -p "输入选项编号: " choice
 
-    case $script_choice in
+    case $choice in
         1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
         2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
-        3) echo "安装宝塔开心版脚本..."; curl http://io.bt.sy/install/update6.sh|bash; show_script_menu ;;
-        4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash; show_script_menu ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
@@ -717,12 +709,14 @@ show_app_market() {
     echo -e "\033[1;37m1. 宝塔面板官方版\033[0m"
     echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
     echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
+    echo -e "\033[1;37m4. 安装宝塔开心版\033[0m"
+    echo -e "\033[1;37m5. 还原到宝塔官方版\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -e -p "请输入你的选择: " sub_choice
+    read -e -p "请输入你的选择: " choice
 
-    case $sub_choice in
+    case $choice in
         1)
             # 宝塔面板官方版
             docker_app_install "baota" \
@@ -759,6 +753,23 @@ show_app_market() {
                 ""
             show_app_market
             ;;
+        4)
+            # 检查是否已安装宝塔面板
+            if [ ! -f "/etc/init.d/bt" ]; then
+                echo -e "\033[31m请先安装宝塔面板官方版（选项1）再安装开心版！\033[0m"
+                sleep 2
+                show_app_market
+            else
+                echo "安装宝塔开心版..."
+                curl http://io.bt.sy/install/update6.sh|bash
+                show_app_market
+            fi
+            ;;
+        5)
+            echo "还原到宝塔官方版..."
+            curl http://download.bt.cn/install/update6.sh|bash
+            show_app_market
+            ;;
         0)
             show_main_menu
             ;;
@@ -769,71 +780,49 @@ show_app_market() {
     esac
 }
 
-# 通用Docker应用安装函数
-docker_app_install() {
-    local name=$1
-    local image=$2
-    local port=$3
-    local run_cmd=$4
-    local description=$5
-    local url=$6
-    local use_cmd=$7
-    local passwd_cmd=$8
+# 安装宝塔开心版
+install_bt_happy() {
+    echo "正在安装宝塔开心版..."
+    
+    # 下载并执行宝塔开心版安装脚本
+    curl -sSO https://raw.githubusercontent.com/vbskycn/btpanel-v7.7.0/main/install/install_panel.sh
+    sudo bash install_panel.sh
+    
+    # 安装完成后执行优化命令
+    if [ -f /etc/init.d/bt ]; then
+        bt 14
+        bt 15
+        echo -e "\033[32m宝塔开心版安装完成！\033[0m"
+        echo -e "\033[33m面板地址: http://$(curl -s ipv4.icanhazip.com):8888\033[0m"
+        echo -e "\033[33m面板账号和密码已发送到您的服务器 /root/bt.txt\033[0m"
+    else
+        echo -e "\033[31m安装失败，请检查网络连接后重试\033[0m"
+    fi
+    
+    read -n 1 -s -r -p "按任意键继续..."
+    echo
+    show_app_market
+}
 
-    while true; do
-        check_docker_app
-        check_docker_image_update $name
-        clear
-        echo -e "$description $check_docker $update_status"
-        echo "官网介绍: $url"
-        
-        if docker inspect "$name" &>/dev/null; then
-            check_docker_app_ip
-        fi
-        echo ""
-
-        echo "------------------------"
-        echo "1. 安装           2. 更新           3. 卸载"
-        echo "------------------------"
-        echo "5. 域名访问"
-        echo "------------------------"
-        echo "0. 返回上一级"
-        echo "------------------------"
-        read -e -p "请输入你的选择: " choice
-
-        case $choice in
-            1)
-                install_docker
-                eval "$run_cmd"
-                if [ ! -z "$use_cmd" ]; then
-                    eval "$use_cmd"
-                fi
-                if [ ! -z "$passwd_cmd" ]; then
-                    eval "$passwd_cmd"
-                fi
-                ;;
-            2)
-                docker rm -f $name
-                docker rmi -f $image
-                eval "$run_cmd"
-                ;;
-            3)
-                docker rm -f $name
-                docker rmi -f $image
-                rm -rf /home/docker/$name
-                echo "应用已卸载"
-                ;;
-            5)
-                echo "${name}域名访问设置"
-                add_yuming
-                ldnmp_Proxy ${yuming} ${ipv4_address} ${port}
-                ;;
-            *)
-                break
-                ;;
-        esac
-        break_end
-    done
+# 还原宝塔官方版
+restore_bt_official() {
+    echo "正在还原到宝塔官方版..."
+    
+    # 下载并执行宝塔官方安装脚本
+    curl -sSO http://download.bt.cn/install/install_panel.sh
+    sudo bash install_panel.sh
+    
+    if [ -f /etc/init.d/bt ]; then
+        echo -e "\033[32m宝塔面板已还原到官方版！\033[0m"
+        echo -e "\033[33m面板地址: http://$(curl -s ipv4.icanhazip.com):8888\033[0m"
+        echo -e "\033[33m面板账号和密码已发送到您的服务器 /root/bt.txt\033[0m"
+    else
+        echo -e "\033[31m还原失败，请检查网络连接后重试\033[0m"
+    fi
+    
+    read -n 1 -s -r -p "按任意键继续..."
+    echo
+    show_app_market
 }
 
 # 开启root密码登入
