@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.1 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.2 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -436,7 +436,7 @@ set_swap() {
     echo "正在设置虚拟内存..."
     
     # 显示当前内存和swap使用情况
-    echo "当前内存使用情况:"
+    echo "当前内���使用情况:"
     free -h
     echo "------------------------"
     
@@ -1033,7 +1033,7 @@ show_script_menu() {
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项编号或代���: " choice
+    read -p "输入选项编号或代码: " choice
 
     case $choice in
         1|script1) 
@@ -1065,7 +1065,7 @@ show_app_market() {
     echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
     echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
     echo -e "\033[1;37m4. 安装宝塔开心版\033[0m"
-    echo -e "\033[1;37m5. 还原到宝塔官方版\033[0m"
+    echo -e "\033[1;37m5. 还原宝塔官方版\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
@@ -1179,7 +1179,7 @@ enable_root_key() {
         REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
     fi
     
-    # 如果上面的方法失败，尝试其他方法
+    # 如果上面的方��失败，尝试其他方法
     if [ -z "$REAL_USER" ]; then
         REAL_USER=$SUDO_USER
     fi
@@ -1263,10 +1263,44 @@ enable_root_key() {
 
 # 添加自用服务器开箱函数
 server_init() {
+    echo -e "\033[1;33m自用服务器开箱配置将执行以下操作：\033[0m"
+    echo -e "\033[1;37m1. 更新系统\033[0m"
+    echo -e "\033[1;37m2. 安装常用工具 (curl wget git vim unzip 等)\033[0m"
+    echo -e "\033[1;37m3. 安装 Docker\033[0m"
+    echo -e "\033[1;37m4. 安装开发工具 (python java gcc cmake 等)\033[0m"
+    echo -e "\033[1;37m5. 安装网络工具 (nmap telnet 等)\033[0m"
+    echo -e "\033[1;37m6. 设置快捷键V\033[0m"
+    echo -e "\033[1;37m7. 系统内核优化为高性能模式\033[0m"
+    echo -e "\033[1;37m8. 配置root密钥登入\033[0m"
+    echo -e "\033[1;37m9. 设置2GB虚拟内存\033[0m"
+    echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
+    echo -e "\033[1;37m11. 设置时区为上海\033[0m"
+    echo -e "\033[1;37m12. 优化DNS配置\033[0m"
+    echo -e "\033[1;37m13. 安装kejilion脚本\033[0m"
+    echo -e "\033[1;37m14. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;33m注意：此操作将修改系统配置，请确保知晓所有更改内容。\033[0m"
+    read -p "是否继续？(y/n): " confirm
+    
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo "操作已取消"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
     echo -e "\033[1;33m开始执行自用服务器开箱配置...\033[0m"
     
     echo -e "\n\033[1;32m[1/13] 更新系统...\033[0m"
-    update_system
+    if [ -f /etc/debian_version ]; then
+        apt update && apt upgrade -y
+    elif [ -f /etc/redhat-release ]; then
+        yum update -y
+    elif [ -f /etc/alpine-release ]; then
+        apk update && apk upgrade
+    elif [ -f /etc/arch-release ]; then
+        pacman -Syu --noconfirm
+    fi
     
     echo -e "\n\033[1;32m[2/13] 安装常用工具...\033[0m"
     case "$ID" in
@@ -1285,24 +1319,9 @@ server_init() {
     esac
     
     echo -e "\n\033[1;32m[3/13] 安装Docker...\033[0m"
-    case "$ID" in
-        ubuntu|debian|kali)
-            curl -fsSL https://get.docker.com | sh
-            $PKG_INSTALL docker-compose
-            ;;
-        centos|redhat|fedora|alma|rocky)
-            curl -fsSL https://get.docker.com | sh
-            $PKG_INSTALL docker-compose
-            ;;
-        arch)
-            $PKG_INSTALL docker docker-compose
-            ;;
-        alpine)
-            $PKG_INSTALL docker docker-compose
-            ;;
-    esac
-    sudo systemctl enable docker
-    sudo systemctl start docker
+    curl -fsSL https://get.docker.com | sh
+    systemctl enable docker
+    systemctl start docker
     
     echo -e "\n\033[1;32m[4/13] 安装开发工具...\033[0m"
     case "$ID" in
@@ -1337,32 +1356,118 @@ server_init() {
     esac
     
     echo -e "\n\033[1;32m[6/13] 设置快捷键V...\033[0m"
-    set_shortcut
+    if [ -d "/etc/profile.d" ]; then
+        echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+        sudo chmod +x /etc/profile.d/linux-tools-alias.sh
+    fi
     
     echo -e "\n\033[1;32m[7/13] 配置系统内核高性能优化模式...\033[0m"
-    optimize_high_performance
+    cat > /etc/sysctl.conf << EOF
+# 系统级别的能打开的文件描述符数量
+fs.file-max = 1000000
+# 单个进程能够打开的文件描述符数量
+fs.nr_open = 1000000
+# 内核 TCP 资源参数
+net.ipv4.tcp_mem = 786432 2097152 3145728
+net.ipv4.tcp_rmem = 4096 4096 16777216
+net.ipv4.tcp_wmem = 4096 4096 16777216
+net.ipv4.tcp_max_syn_backlog = 8192
+net.ipv4.tcp_max_tw_buckets = 5000
+net.ipv4.tcp_max_orphans = 3276800
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_keepalive_time = 600
+net.ipv4.tcp_keepalive_probes = 3
+net.ipv4.tcp_keepalive_intvl = 15
+net.ipv4.tcp_retries2 = 5
+net.ipv4.tcp_syn_retries = 2
+net.ipv4.tcp_synack_retries = 2
+# 网络资源参数
+net.core.wmem_max = 16777216
+net.core.rmem_max = 16777216
+net.core.wmem_default = 262144
+net.core.rmem_default = 262144
+net.core.netdev_max_backlog = 8192
+net.core.somaxconn = 8192
+# 虚拟内存参数
+vm.swappiness = 10
+vm.dirty_ratio = 60
+vm.dirty_background_ratio = 30
+vm.overcommit_memory = 1
+EOF
+    sysctl -p
     
     echo -e "\n\033[1;32m[8/13] 配置root密钥登入...\033[0m"
-    enable_root_key
+    # 获取真实用户和目录
+    REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
+    REAL_USER=${REAL_USER:-$(whoami)}
+    REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+    REAL_HOME=${REAL_HOME:-$HOME}
     
-    echo -e "\n\033[1;32m[9/13] 设置虚拟内存...\033[0m"
-    set_swap
+    # 设置密钥
+    mkdir -p /root/.ssh "$REAL_HOME/.ssh"
+    ssh-keygen -t rsa -b 4096 -f "/root/.ssh/id_rsa_root" -N "" -q
+    cat "/root/.ssh/id_rsa_root.pub" > /root/.ssh/authorized_keys
+    cp "/root/.ssh/id_rsa_root"* "$REAL_HOME/.ssh/"
+    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
+    chmod 700 /root/.ssh "$REAL_HOME/.ssh"
+    chmod 600 /root/.ssh/authorized_keys "$REAL_HOME/.ssh/id_rsa_root"
+    chmod 644 "$REAL_HOME/.ssh/id_rsa_root.pub"
     
-    echo -e "\n\033[1;32m[10/13] 设置SSH端口...\033[0m"
-    set_ssh_port
+    # 配置SSH
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    systemctl restart sshd
+    
+    echo -e "\n\033[1;32m[9/13] 设置虚拟内存(2GB)...\033[0m"
+    if swapon -s | grep -q "/swapfile"; then
+        swapoff /swapfile
+        rm -f /swapfile
+    fi
+    fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo "/swapfile none swap sw 0 0" >> /etc/fstab
+    
+    echo -e "\n\033[1;32m[10/13] 设置SSH端口(5522)...\033[0m"
+    sed -i 's/^#*Port .*/Port 5522/' /etc/ssh/sshd_config
+    if [ -f /etc/debian_version ]; then
+        ufw allow 5522/tcp >/dev/null 2>&1
+    elif [ -f /etc/redhat-release ]; then
+        firewall-cmd --permanent --add-port=5522/tcp >/dev/null 2>&1
+        firewall-cmd --reload >/dev/null 2>&1
+    fi
+    systemctl restart sshd
     
     echo -e "\n\033[1;32m[11/13] 设置时区...\033[0m"
-    set_timezone
+    timedatectl set-timezone Asia/Shanghai
     
     echo -e "\n\033[1;32m[12/13] 优化DNS...\033[0m"
-    optimize_dns
+    cp /etc/resolv.conf /etc/resolv.conf.bak
+    if curl -s https://ipapi.co/json | grep -q '"country": "CN"'; then
+        echo -e "nameserver 223.5.5.5\nnameserver 114.114.114.114" > /etc/resolv.conf
+    else
+        echo -e "nameserver 1.1.1.1\nnameserver 8.8.8.8" > /etc/resolv.conf
+    fi
+    
+    
+    
+    echo -e "\n\033[1;32m[完成] 清理不再需要的软件包...\033[0m"
+    if [ -f /etc/debian_version ]; then
+        apt autoremove -y && apt clean
+    elif [ -f /etc/redhat-release ]; then
+        yum autoremove -y && yum clean all
+    elif [ -f /etc/alpine-release ]; then
+        apk cache clean
+    elif [ -f /etc/arch-release ]; then
+        pacman -Sc --noconfirm
+    fi
     
     echo -e "\n\033[1;32m[13/13] 安装kejilion脚本...\033[0m"
     curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
-    
-    echo -e "\n\033[1;32m[完成] 清理不再需要的软件包...\033[0m"
-    clean_packages
-    
+
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
