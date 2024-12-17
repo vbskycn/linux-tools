@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.96 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.97 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -396,7 +396,7 @@ clean_packages() {
     show_system_menu
 }
 
-# 更改系��名
+# 更改系统���
 change_hostname() {
     read -p "请输入新的主机名: " new_hostname
     hostnamectl set-hostname $new_hostname
@@ -438,7 +438,7 @@ set_swap() {
     free -h
     echo "------------------------"
     
-    # 提示用户输入新的swap大小，默认为2GB
+    # 提示用户输入的swap大小，默认为2GB
     read -p "请输入要设置的虚拟内存大小(GB) [默认: 2]: " swap_size
     swap_size=${swap_size:-2}  # 如果用户直接回车，使用默认值2
     
@@ -475,7 +475,7 @@ set_swap() {
     # 使用fallocate创建swap文件（更快且更可靠）
     if ! sudo fallocate -l ${swap_size}G /swapfile; then
         echo "使用fallocate创建失败，尝试使用dd命令..."
-        # 如果fallocate失败��使用dd作为备选方案
+        # 如果fallocate失败使用dd作为备选方案
         if ! sudo dd if=/dev/zero of=/swapfile bs=1024K count=$((swap_size * 1024)) status=progress; then
             echo "创建虚拟内存文件失败"
             echo -e "\033[1;32m按任意键返回...\033[0m"
@@ -576,9 +576,25 @@ set_ssh_port() {
         return
     fi
     
+    # 在防火墙中开放新端口
+    if [ -f /etc/debian_version ]; then
+        echo "检测到 Debian/Ubuntu 系统，配置 ufw..."
+        if command -v ufw >/dev/null 2>&1; then
+            sudo ufw allow $new_port/tcp >/dev/null 2>&1
+            echo "已在 ufw 防火墙中开放端口 $new_port"
+        fi
+    elif [ -f /etc/redhat-release ]; then
+        echo "检测到 RHEL/CentOS 系统，配置 firewalld..."
+        if systemctl is-active --quiet firewalld; then
+            sudo firewall-cmd --permanent --add-port=$new_port/tcp >/dev/null 2>&1
+            sudo firewall-cmd --reload >/dev/null 2>&1
+            echo "已在 firewalld 防火墙中开放端口 $new_port"
+        fi
+    fi
+    
     # 重启SSH服务
     if ! sudo systemctl restart sshd; then
-        echo "重启SSH服务失败，正在还原备份..."
+        echo "重启SSH服务失���，正在还原备份..."
         sudo mv /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
         sudo systemctl restart sshd
         echo -e "\033[1;32m按任意键返回...\033[0m"
@@ -590,7 +606,8 @@ set_ssh_port() {
     echo "SSH端口已成功更改！"
     echo "原端口: $current_port"
     echo "新端口: $new_port"
-    echo -e "\033[33m请确保在防火墙中开放新端口，并记住新的端口号\033[0m"
+    echo -e "\033[33m注意：新的SSH端口已在防火墙中开放\033[0m"
+    echo -e "\033[33m如果使用其他防火墙，请手动开放端口 $new_port\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -835,7 +852,7 @@ EOF
 optimize_web_server() {
     # 系统参数优化（网站服务器模式）
     cat > /etc/sysctl.conf << EOF
-# 文件描述符限制
+# 文件描���符限制
 fs.file-max = 2000000
 fs.nr_open = 2000000
 
@@ -962,7 +979,7 @@ show_kernel_optimize() {
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m2. 均衡化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m2. 均衡化模式：       性能与���源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
@@ -1155,9 +1172,30 @@ enable_root_key() {
         return
     fi
     
+    # 获取真实的登录用户
+    REAL_USER=$(who am i | awk '{print $1}')
+    if [ -z "$REAL_USER" ]; then
+        REAL_USER=$(logname 2>/dev/null)
+    fi
+    if [ -z "$REAL_USER" ]; then
+        REAL_USER=$SUDO_USER
+    fi
+    
+    # 如果还是无法获取真实用户，则提示错误
+    if [ -z "$REAL_USER" ]; then
+        echo "无法确定真实的登录用户，请直接使用登录用户执行此命令"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 获取真实用户的家目录
+    REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+    
     # 设置密钥文件路径
     KEY_FILE="/root/id_rsa_root"
-    USER_KEY_FILE="$HOME/id_rsa_root"
+    USER_KEY_FILE="$REAL_HOME/id_rsa_root"
     
     # 检查密钥是否已存在
     if [ -f "$KEY_FILE" ]; then
@@ -1192,7 +1230,7 @@ enable_root_key() {
     # 修改SSH配置
     if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config || \
        ! sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config; then
-        echo "修改SSH配置失败"
+        echo "修��SSH配置失败"
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
@@ -1208,19 +1246,20 @@ enable_root_key() {
         return
     fi
     
-    # 复制私钥到当前用户目录（如果不存在）
+    # 复制私钥到真实用户的目录（如果不存在）
     if [ ! -f "$USER_KEY_FILE" ]; then
         cp "$KEY_FILE" "$USER_KEY_FILE"
+        chown "$REAL_USER:$REAL_USER" "$USER_KEY_FILE"
         chmod 600 "$USER_KEY_FILE"
-        echo "已复制私钥到当前用户目录: $USER_KEY_FILE"
+        echo "已复制私钥到用户 $REAL_USER 的目录: $USER_KEY_FILE"
     else
-        echo "当前用户目录已存在私钥文件: $USER_KEY_FILE"
+        echo "用户 $REAL_USER 的目录已存在私钥文件: $USER_KEY_FILE"
     fi
     
     echo -e "\033[32mroot密钥登入配置成功！\033[0m"
     echo -e "\033[33m私钥文件位置:\033[0m"
     echo -e "\033[33m1. root目录: $KEY_FILE\033[0m"
-    echo -e "\033[33m2. 当前用户目录: $USER_KEY_FILE\033[0m"
+    echo -e "\033[33m2. 用户 $REAL_USER 的目录: $USER_KEY_FILE\033[0m"
     echo -e "\033[33m请妥善保管私钥文件，建议下载后删除服务器上的私钥\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
