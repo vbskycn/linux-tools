@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# 显示脚本工具箱信息
+show_toolbox_info() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.0 只为更简单的Linux的使用！\033[0m"
+    echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
+    echo -e "\033[1;32m-输入v可快速启动此脚本-\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+}
+
+# 自动更新脚本到 /usr/local/bin/
+if [ "$0" != "/usr/local/bin/linux-tools" ]; then
+    curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux.sh
+    chmod +x linux.sh
+    if ! diff linux.sh /usr/local/bin/linux-tools > /dev/null 2>&1; then
+        echo "脚本有更新，覆盖到 /usr/local/bin/..."
+        sudo mv linux.sh /usr/local/bin/linux-tools
+    else
+        echo "脚本已是最新版本。"
+        rm linux.sh
+    fi
+    exec /usr/local/bin/linux-tools "$@"
+    exit
+fi
+
+show_toolbox_info
+
+# 显示主菜单
+show_main_menu() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m请选择一个选项：\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;32m1. 系统相关\033[0m"
+    echo -e "\033[1;32m2. 脚本大全\033[0m"
+    echo -e "\033[1;31m0. 退出\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    read -p "输入选项编号: " main_choice
+
+    case $main_choice in
+        1) show_system_menu ;;
+        2) show_script_menu ;;
+        0) exit 0 ;;
+        *) echo "无效选项，请重试。"; show_main_menu ;;
+    esac
+}
+
+# 系统相关菜单
+show_system_menu() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m系统相关选项：\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;32m1. 更新系统\033[0m"
+    echo -e "\033[1;32m2. 安装常用工具\033[0m"
+    echo -e "\033[1;32m3. 安装 Docker\033[0m"
+    echo -e "\033[1;32m4. 安装开发工具\033[0m"
+    echo -e "\033[1;32m5. 安装网络工具\033[0m"
+    echo -e "\033[1;32m6. 安装常用数据库\033[0m"
+    echo -e "\033[1;32m7. 安装 Node.js 和 npm\033[0m"
+    echo -e "\033[1;32m8. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;32m9. 更改系统名\033[0m"
+    echo -e "\033[1;32m10. 设置快捷键 v\033[0m"
+    echo -e "\033[1;32m00. 更新本脚本\033[0m"
+    echo -e "\033[1;34m0. 返回主菜单\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    read -p "输入选项编号: " system_choice
+
+    case $system_choice in
+        1) echo "更新系统..."; sudo apt update -y && sudo apt upgrade -y ;;
+        2) echo "安装常用工具..."; sudo apt install -y curl wget git vim unzip build-essential net-tools htop traceroute tmux ;;
+        3) echo "安装 Docker..."; sudo apt install -y docker.io docker-compose; sudo systemctl enable docker; sudo systemctl start docker ;;
+        4) echo "安装开发工具..."; sudo apt install -y python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake ;;
+        5) echo "安装网络工具..."; sudo apt install -y sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping ;;
+        6) echo "安装常用数据库..."; sudo apt install -y mysql-server postgresql redis-server mongodb ;;
+        7) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; sudo apt install -y nodejs ;;
+        8) echo "清理不再需要的软件包..."; sudo apt autoremove -y ;;
+        9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
+        10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
+        00) curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux.sh && \
+            chmod +x linux.sh && \
+            sudo mv linux.sh /usr/local/bin/linux-tools && \
+            /usr/local/bin/linux-tools ;;
+        0) show_main_menu ;;
+        *) echo "无效选项，请重试。"; show_system_menu ;;
+    esac
+}
+
+# 脚本大全菜单
+show_script_menu() {
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m脚本大全：\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;32m1. 安装 kejilion 脚本\033[0m"
+    echo -e "\033[1;32m2. 安装 勇哥的SB 脚本\033[0m"
+    echo -e "\033[1;32m3. 安装宝塔开行版脚本\033[0m"
+    echo -e "\033[1;32m4. 还原到宝塔官方版脚本\033[0m"
+    echo -e "\033[1;31m0. 返回主菜单\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    read -p "输入选项编号: " script_choice
+
+    case $script_choice in
+        1) echo "安装 kejilion 脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
+        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://github.zhoujie218.top/https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
+        3) echo "安装宝塔开行版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
+        4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash ;;
+        0) show_main_menu ;;
+        *) echo "无效选项，请重试。"; show_script_menu ;;
+    esac
+}
+
+# 检查并复制脚本到系统程序目录
+install_script() {
+    if [ ! -f /usr/local/bin/linux-tools ]; then
+        sudo cp $(realpath $0) /usr/local/bin/linux-tools
+        sudo chmod +x /usr/local/bin/linux-tools
+    fi
+    if ! grep -q "alias v='/usr/local/bin/linux-tools'" ~/.bashrc; then
+        echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc
+    fi
+    if [ ! -f ~/.bash_profile ]; then
+        touch ~/.bash_profile
+    fi
+    if ! grep -q "source ~/.bashrc" ~/.bash_profile; then
+        echo "if [ -f ~/.bashrc ]; then source ~/.bashrc; fi" >> ~/.bash_profile
+    fi
+    source ~/.bashrc
+}
+
+# 运行安装脚本
+install_script
+
+# 启动菜单
+show_main_menu
