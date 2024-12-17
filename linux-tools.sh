@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.6 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.7 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -486,7 +486,7 @@ set_swap() {
     
     echo "正在创建 ${swap_size}GB 虚拟内存..."
     
-    # 使用fallocate创建swap文件（更快且更可靠��
+    # 使用fallocate创建swap文件（更快且更可靠）
     if ! sudo fallocate -l ${swap_size}G /swapfile; then
         echo "使用fallocate建失败，尝试使用dd命令..."
         # 如果fallocate失败使用dd作为备选方案
@@ -556,7 +556,7 @@ set_ssh_port() {
     read -p "请输入新的SSH端口号(1-65535) [默认: 5522]: " new_port
     new_port=${new_port:-5522}  # 如果用户直接回车，使用默认值5522
     
-    # 检查端口号是��有效
+    # 检查端口号是否有效
     if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1 ] || [ "$new_port" -gt 65535 ]; then
         echo "无效的端口号！端口号必须在 1-65535 之间"
         echo -e "\033[1;32m按任意键返回...\033[0m"
@@ -719,7 +719,7 @@ nameserver 223.5.5.5
 nameserver 114.114.114.114
 EOF
     else
-        echo "检测到服务器在国外，使用国际DNS..."
+        echo "检测到服务器在国外，���用国际DNS..."
         cat > /etc/resolv.conf << EOF
 nameserver 1.1.1.1
 nameserver 8.8.8.8
@@ -734,7 +734,7 @@ EOF
     show_system_menu
 }
 
-# 高性能优化模��
+# 高性能优化模式
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -782,7 +782,7 @@ net.ipv4.tcp_wmem = 4096 87380 16777216
 net.ipv4.tcp_rmem = 4096 87380 16777216
 net.ipv4.tcp_fastopen = 3
 
-# 虚拟内存参���
+# 虚拟内存参数
 vm.swappiness = 10
 vm.dirty_ratio = 60
 vm.dirty_background_ratio = 30
@@ -856,7 +856,7 @@ EOF
 * hard nproc 32768
 EOF
 
-    echo "均衡优化���式配置完成！"
+    echo "均衡优化模式配置完成！"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -1067,7 +1067,7 @@ show_script_menu() {
     esac
 }
 
-# 应用市场���单
+# 应用市场菜单
 show_app_market() {
     clear
     echo -e "\033[1;34m==============================\033[0m"
@@ -1175,7 +1175,7 @@ enable_root_password() {
 
 # 开启root密钥登入
 enable_root_key() {
-    echo "正在配置root密钥登入..."
+    echo "正在配置root���钥登入..."
     
     # 检查是否有root权限
     if [ "$(id -u)" != "0" ]; then
@@ -1275,7 +1275,12 @@ enable_root_key() {
 
 # 添加自用服务器开箱函数
 server_init() {
-    echo -e "\033[1;33m自用服务器开箱配置将执行以下操作：（请慎用，有交互的回车或者选y就可以了）\033[0m"
+    # 设置日志文件
+    LOG_FILE="/var/log/server_init.log"
+    exec 1> >(tee -a "$LOG_FILE")
+    exec 2> >(tee -a "$LOG_FILE" >&2)
+    
+    echo -e "\033[1;33m自用服务器开箱配置将执行以下操作：\033[0m"
     echo -e "\033[1;37m1. 更新系统\033[0m"
     echo -e "\033[1;37m2. 安装常用工具 (curl wget git vim unzip 等)\033[0m"
     echo -e "\033[1;37m3. 安装 Docker\033[0m"
@@ -1289,23 +1294,16 @@ server_init() {
     echo -e "\033[1;37m11. 设置时区为上海\033[0m"
     echo -e "\033[1;37m12. 优化DNS配置\033[0m"
     echo -e "\033[1;37m13. 清理不再需要的软件包\033[0m"
-    echo -e "\033[1;33m注意：此操作将修改系统配置，请确保知晓所有更改内容。\033[0m"
-    read -p "是否继续？(y/n): " confirm
+    echo -e "\033[1;33m注意：此操作将修改系统配置。\033[0m"
     
-    if [[ ! $confirm =~ ^[Yy]$ ]]; then
-        echo "操作已取消"
-        echo -e "\033[1;32m按任意键返回...\033[0m"
-        read -n 1
-        show_system_menu
-        return
-    fi
-    
+    # 自动确认，无需用户交互
     echo -e "\033[1;33m开始执行自用服务器开箱配置...\033[0m"
     
+    # 1. 更新系统
     echo -e "\n\033[1;32m[1/13] 更新系统...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq
+            DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get upgrade -y -qq
             ;;
         centos|redhat|fedora|alma|rocky)
             yum update -y -q
@@ -1318,175 +1316,142 @@ server_init() {
             ;;
     esac
     
+    # 2. 安装常用工具
     echo -e "\n\033[1;32m[2/13] 安装常用工具...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop inetutils-traceroute tmux
+            DEBIAN_FRONTEND=noninteractive $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop inetutils-traceroute tmux
             ;;
         centos|redhat|fedora|alma|rocky)
-            $PKG_INSTALL curl wget git vim unzip gcc make net-tools htop traceroute tmux
+            $PKG_INSTALL -q curl wget git vim unzip gcc make net-tools htop traceroute tmux
             ;;
         arch)
-            $PKG_INSTALL curl wget git vim unzip base-devel net-tools htop traceroute tmux
+            $PKG_INSTALL --quiet curl wget git vim unzip base-devel net-tools htop traceroute tmux
             ;;
         alpine)
             $PKG_INSTALL curl wget git vim unzip build-base net-tools htop traceroute tmux
             ;;
     esac
     
+    # 3. 安装Docker
     echo -e "\n\033[1;32m[3/13] 安装Docker...\033[0m"
     if ! command -v docker &> /dev/null; then
-        echo "Docker未安装，开始安装..."
-        curl -fsSL https://get.docker.com | sh
-        systemctl enable docker
-        systemctl start docker
-    else
-        echo "Docker已安装，跳过安装步骤"
+        curl -fsSL https://get.docker.com | sh > /dev/null 2>&1
+        systemctl enable docker > /dev/null 2>&1
+        systemctl start docker > /dev/null 2>&1
     fi
     
+    # 4. 安装开发工具
     echo -e "\n\033[1;32m[4/13] 安装开发工具...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
+            DEBIAN_FRONTEND=noninteractive $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake
             ;;
         centos|redhat|fedora|alma|rocky)
-            $PKG_INSTALL python3 python3-pip java-11-openjdk-devel gcc gcc-c++ make cmake
+            $PKG_INSTALL -q python3 python3-pip java-11-openjdk-devel gcc gcc-c++ make cmake
             ;;
         arch)
-            $PKG_INSTALL python python-pip jdk11-openjdk gcc make cmake
+            $PKG_INSTALL --quiet python python-pip jdk11-openjdk gcc make cmake
             ;;
         alpine)
             $PKG_INSTALL python3 py3-pip openjdk11 gcc g++ make cmake
             ;;
     esac
     
+    # 5. 安装网络工具
     echo -e "\n\033[1;32m[5/13] 安装网络工具...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
+            DEBIAN_FRONTEND=noninteractive $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping
             ;;
         centos|redhat|fedora|alma|rocky)
-            $PKG_INSTALL sshpass telnet nmap iperf3 bind-utils net-tools iputils
+            $PKG_INSTALL -q sshpass telnet nmap iperf3 bind-utils net-tools iputils
             ;;
         arch)
-            $PKG_INSTALL sshpass telnet nmap iperf3 bind-tools net-tools iputils
+            $PKG_INSTALL --quiet sshpass telnet nmap iperf3 bind-tools net-tools iputils
             ;;
         alpine)
             $PKG_INSTALL sshpass busybox-extras nmap iperf3 bind-tools net-tools iputils
             ;;
     esac
     
+    # 6. 设置快捷键V
     echo -e "\n\033[1;32m[6/13] 设置快捷键V...\033[0m"
-    if [ -d "/etc/profile.d" ]; then
-        echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
-        sudo chmod +x /etc/profile.d/linux-tools-alias.sh
-    fi
+    echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+    sudo chmod +x /etc/profile.d/linux-tools-alias.sh
     
+    # 7. 系统内核优化
     echo -e "\n\033[1;32m[7/13] 配置系统内核高性能优化模式...\033[0m"
-    cat > /etc/sysctl.conf << EOF
-# 系统级别的能打开的文件描述符数量
-fs.file-max = 1000000
-# 单个进程能够打开的文件描述符数量
-fs.nr_open = 1000000
-# 内核 TCP 资源参数
-net.ipv4.tcp_mem = 786432 2097152 3145728
-net.ipv4.tcp_rmem = 4096 4096 16777216
-net.ipv4.tcp_wmem = 4096 4096 16777216
-net.ipv4.tcp_max_syn_backlog = 8192
-net.ipv4.tcp_max_tw_buckets = 5000
-net.ipv4.tcp_max_orphans = 3276800
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_fin_timeout = 30
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_keepalive_time = 600
-net.ipv4.tcp_keepalive_probes = 3
-net.ipv4.tcp_keepalive_intvl = 15
-net.ipv4.tcp_retries2 = 5
-net.ipv4.tcp_syn_retries = 2
-net.ipv4.tcp_synack_retries = 2
-# 网络资源参数
-net.core.wmem_max = 16777216
-net.core.rmem_max = 16777216
-net.core.wmem_default = 262144
-net.core.rmem_default = 262144
-net.core.netdev_max_backlog = 8192
-net.core.somaxconn = 8192
-# 虚拟内存参数
-vm.swappiness = 10
-vm.dirty_ratio = 60
-vm.dirty_background_ratio = 30
-vm.overcommit_memory = 1
-EOF
-    sysctl -p
+    optimize_high_performance > /dev/null 2>&1
     
+    # 8. 配置root密钥登入
     echo -e "\n\033[1;32m[8/13] 配置root密钥登入...\033[0m"
-    # 获取真实用户和目录
-    REAL_USER=$(who | grep -E "$SSH_CLIENT|$SSH_TTY" | awk '{print $1}' | head -n1)
-    REAL_USER=${REAL_USER:-$(whoami)}
-    REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
-    REAL_HOME=${REAL_HOME:-$HOME}
+    enable_root_key > /dev/null 2>&1
     
-    # 设置密钥
-    mkdir -p /root/.ssh "$REAL_HOME/.ssh"
-    ssh-keygen -t rsa -b 4096 -f "/root/.ssh/id_rsa_root" -N "" -q
-    cat "/root/.ssh/id_rsa_root.pub" > /root/.ssh/authorized_keys
-    cp "/root/.ssh/id_rsa_root"* "$REAL_HOME/.ssh/"
-    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.ssh"
-    chmod 700 /root/.ssh "$REAL_HOME/.ssh"
-    chmod 600 /root/.ssh/authorized_keys "$REAL_HOME/.ssh/id_rsa_root"
-    chmod 644 "$REAL_HOME/.ssh/id_rsa_root.pub"
-    
-    # 配置SSH
-    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-    systemctl restart sshd
-    
+    # 9. 设置虚拟内存
     echo -e "\n\033[1;32m[9/13] 设置虚拟内存(2GB)...\033[0m"
     if swapon -s | grep -q "/swapfile"; then
         swapoff /swapfile
         rm -f /swapfile
     fi
-    fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+    fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
     chmod 600 /swapfile
-    mkswap /swapfile
+    mkswap /swapfile > /dev/null
     swapon /swapfile
     echo "/swapfile none swap sw 0 0" >> /etc/fstab
     
+    # 10. 设置SSH端口
     echo -e "\n\033[1;32m[10/13] 设置SSH端口(5522)...\033[0m"
     sed -i 's/^#*Port .*/Port 5522/' /etc/ssh/sshd_config
     if [ -f /etc/debian_version ]; then
-        ufw allow 5522/tcp >/dev/null 2>&1
+        ufw allow 5522/tcp > /dev/null 2>&1
     elif [ -f /etc/redhat-release ]; then
-        firewall-cmd --permanent --add-port=5522/tcp >/dev/null 2>&1
-        firewall-cmd --reload >/dev/null 2>&1
+        firewall-cmd --permanent --add-port=5522/tcp > /dev/null 2>&1
+        firewall-cmd --reload > /dev/null 2>&1
     fi
-    systemctl restart sshd
+    systemctl restart sshd > /dev/null 2>&1
     
+    # 11. 设置时区
     echo -e "\n\033[1;32m[11/13] 设置时区...\033[0m"
-    timedatectl set-timezone Asia/Shanghai
+    timedatectl set-timezone Asia/Shanghai > /dev/null 2>&1
     
+    # 12. 优化DNS
     echo -e "\n\033[1;32m[12/13] 优化DNS...\033[0m"
     cp /etc/resolv.conf /etc/resolv.conf.bak
-    if curl -s https://ipapi.co/json | grep -q '"country": "CN"'; then
-        echo -e "nameserver 223.5.5.5\nnameserver 114.114.114.114" > /etc/resolv.conf
+    # 检查IP是否在中国
+    if curl -s https://ipapi.co/json/ | grep -q '"country": "CN"'; then
+        echo "检测到服务器在中国，使用国内DNS..."
+        cat > /etc/resolv.conf << EOF
+nameserver 223.5.5.5
+nameserver 114.114.114.114
+EOF
     else
-        echo -e "nameserver 1.1.1.1\nnameserver 8.8.8.8" > /etc/resolv.conf
+        echo "检测到服务器在国外，使用国际DNS..."
+        cat > /etc/resolv.conf << EOF
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+EOF
     fi
     
-    
-    
-    echo -e "\n\033[1;32m[完成] 清理不再需要的软件包...\033[0m"
-    if [ -f /etc/debian_version ]; then
-        apt autoremove -y && apt clean
-    elif [ -f /etc/redhat-release ]; then
-        yum autoremove -y && yum clean all
-    elif [ -f /etc/alpine-release ]; then
-        apk cache clean
-    elif [ -f /etc/arch-release ]; then
-        pacman -Sc --noconfirm
-    fi
+    # 13. 清理软件包
+    echo -e "\n\033[1;32m[13/13] 清理不再需要的软件包...\033[0m"
+    case "$ID" in
+        ubuntu|debian|kali)
+            apt-get autoremove -y -qq && apt-get clean -qq
+            ;;
+        centos|redhat|fedora|alma|rocky)
+            yum autoremove -y -q && yum clean all -q
+            ;;
+        arch)
+            pacman -Sc --noconfirm --quiet
+            ;;
+        alpine)
+            apk cache clean
+            ;;
+    esac
 
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
+    echo -e "\033[1;33m请查看日志文件了解详细信息：$LOG_FILE\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
