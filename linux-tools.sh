@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.25 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.26 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -110,6 +110,11 @@ show_system_menu() {
     echo -e "\033[1;32m8. 清理不再需要的软件包\033[0m"
     echo -e "\033[1;32m9. 更改系统名\033[0m"
     echo -e "\033[1;32m10. 设置快捷键 v\033[0m"
+    echo -e "\033[1;32m11. 设置虚拟内存\033[0m"
+    echo -e "\033[1;32m12. 设置SSH端口\033[0m"
+    echo -e "\033[1;32m13. 开放所有端口\033[0m"
+    echo -e "\033[1;32m14. 设置系统时区\033[0m"
+    echo -e "\033[1;32m15. 自动优化DNS地址\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;31m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -126,6 +131,107 @@ show_system_menu() {
         8) echo "清理不再需要的软件包..."; $PKG_REMOVE ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
         10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
+        11) 
+            echo "设置虚拟内存 (默认1G)..."
+            read -p "请输入虚拟内存大小（单位：G，直接回车默认1G）: " swap_size
+            swap_size=${swap_size:-1}
+            
+            # 检查是否已存在swap
+            if swapon -s | grep -q "/swapfile"; then
+                echo "检测到已存在虚拟内存，先移除旧的..."
+                sudo swapoff /swapfile
+                sudo rm -f /swapfile
+            fi
+            
+            echo "创建${swap_size}G虚拟内存..."
+            sudo fallocate -l ${swap_size}G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            
+            # 确保开机自动挂载
+            if ! grep -q "/swapfile swap" /etc/fstab; then
+                echo "/swapfile swap swap defaults 0 0" | sudo tee -a /etc/fstab
+            fi
+            echo "虚拟内存设置完成！" ;;
+            
+        12)
+            echo "设置SSH端口 (默认5522)..."
+            read -p "请输入新的SSH端口号（直接回车默认5522）: " ssh_port
+            ssh_port=${ssh_port:-5522}
+            
+            # 修改SSH配置文件
+            sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+            sudo sed -i "s/^#*Port [0-9]*/Port $ssh_port/" /etc/ssh/sshd_config
+            
+            # 如果是使用UFW的系统，添加防火墙规则
+            if command -v ufw >/dev/null 2>&1; then
+                sudo ufw allow $ssh_port/tcp
+            fi
+            
+            # 如果是使用firewalld的系统，添加防火墙规则
+            if command -v firewall-cmd >/dev/null 2>&1; then
+                sudo firewall-cmd --permanent --add-port=$ssh_port/tcp
+                sudo firewall-cmd --reload
+            fi
+            
+            sudo systemctl restart sshd
+            echo "SSH端口已更改为 $ssh_port" ;;
+            
+        13)
+            echo "开放所有端口..."
+            # 检测系统使用的防火墙
+            if command -v ufw >/dev/null 2>&1; then
+                sudo ufw disable
+                echo "已禁用UFW防火墙"
+            elif command -v firewall-cmd >/dev/null 2>&1; then
+                sudo systemctl stop firewalld
+                sudo systemctl disable firewalld
+                echo "已禁用firewalld防火墙"
+            else
+                echo "未检测到支持的防火墙系统"
+            fi
+            echo "所有端口已开放，请注意系统安全！" ;;
+            
+        14)
+            echo "设置系统时区 (默认Asia/Shanghai)..."
+            read -p "请输入时区（直接回车默认Asia/Shanghai）: " timezone
+            timezone=${timezone:-"Asia/Shanghai"}
+            
+            if sudo timedatectl set-timezone $timezone; then
+                echo "系统时区已设置为 $timezone"
+                # 同步硬件时间
+                sudo hwclock --systohc
+            else
+                echo "时区设置失败，请确认时区名称是否正确"
+            fi ;;
+            
+        15)
+            echo "自动优化DNS地址..."
+            
+            # 获取公网IP
+            public_ip=$(curl -s https://api.ipify.org)
+            
+            # 检查是否是中国IP
+            is_china_ip=$(curl -s "https://ipapi.co/${public_ip}/country" 2>/dev/null)
+            
+            if [ "$is_china_ip" = "CN" ]; then
+                # 中国IP使用国内DNS
+                echo "检测到中国IP，使用国内DNS..."
+                echo "nameserver 223.5.5.5
+nameserver 114.114.114.114" | sudo tee /etc/resolv.conf > /dev/null
+                echo "已设置为国内DNS (223.5.5.5, 114.114.114.114)"
+            else
+                # 非中国IP使用国外DNS
+                echo "检测到海外IP，使用国际DNS..."
+                echo "nameserver 1.1.1.1
+nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+                echo "已设置为国际DNS (1.1.1.1, 8.8.8.8)"
+            fi
+            
+            # 防止DNS被自动覆盖
+            sudo chattr +i /etc/resolv.conf
+            echo "DNS设置已完成并已防止自动修改" ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
