@@ -21,9 +21,17 @@
    - 安装宝塔开行版脚本
    - 还原到宝塔官方版脚本
 
+## 更新说明
+
+- 所有 `https://raw.githubusercontent.com` 链接已更改为通过代理服务器 `https://ghp.ci/raw.githubusercontent.com` 访问，以提高网络可访问性。
+- 脚本现在会下载到本地，并设置快捷键 `v` 来运行本地的 `linux.sh`。
+
 ## 使用方法
 
-要运行此脚本并访问菜单，请执行以下命令：
+要运行此脚本并访问菜单，请执行以下命令，这将下载脚本到本地并设置快捷键：
 
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh)
+curl -sS -O https://ghp.ci/raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && ./linux.sh
+```
+
+然后，您可以通过在终端中输入 `v` 来快速启动本地脚本。

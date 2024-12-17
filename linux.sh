@@ -57,8 +57,8 @@ show_script_menu() {
     read -p "输入选项编号: " script_choice
 
     case $script_choice in
-        1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
-        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
+        1) echo "安装 kejilion 脚本..."; curl -sS -O https://ghp.ci/raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh ;;
+        2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://ghp.ci/raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh) ;;
         3) echo "安装宝塔开行版脚本..."; curl http://io.bt.sy/install/update6.sh|bash ;;
         4) echo "还原到宝塔官方版脚本..."; curl http://download.bt.cn/install/update6.sh|bash ;;
         0) show_main_menu ;;
@@ -66,15 +66,23 @@ show_script_menu() {
     esac
 }
 
-# 添加快捷命令
+# 修改快捷命令设置
 setup_alias() {
-    echo "alias v='bash $(realpath $0)'" >> ~/.bashrc
+    echo "alias v='bash ~/linux-tools/linux.sh'" >> ~/.bashrc
     source ~/.bashrc
     echo "快捷命令 'v' 已添加并生效。"
 }
 
-# 运行快捷命令设置
-setup_alias
+# 下载并设置本地脚本
+setup_local_script() {
+    mkdir -p ~/linux-tools
+    curl -sSL https://ghp.ci/raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh -o ~/linux-tools/linux.sh
+    chmod +x ~/linux-tools/linux.sh
+    echo "本地脚本已下载并设置完成。"
+}
+
+# 运行本地脚本设置
+setup_local_script
 
 # 启动菜单
 show_main_menu
