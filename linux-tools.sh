@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.85 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.86 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -140,11 +140,11 @@ show_main_menu() {
     read -p "输入选项编号或代码: " main_choice
 
     case $main_choice in
-        01|sys) show_system_menu ;;
-        02|tool) show_basic_tools_menu ;;
-        03|script) show_script_menu ;;
-        04|app) show_app_market ;;
-        00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && \
+        1|sys) show_system_menu ;;
+        2|tool) show_basic_tools_menu ;;
+        3|script) show_script_menu ;;
+        4|app) show_app_market ;;
+        9) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && \
             chmod +x linux-tools.sh && \
             sudo mv linux-tools.sh /usr/local/bin/linux-tools && \
             /usr/local/bin/linux-tools ;;
@@ -169,44 +169,13 @@ show_basic_tools_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号或代码: " tools_choice
 
-    # 如果输入的是纯数字，自动添加tool前缀
-    if [[ $tools_choice =~ ^[0-9]+$ ]]; then
-        if [ "$tools_choice" = "0" ]; then
-            show_main_menu
-            return
-        fi
-        # 将个位数转换为两位数格式
-        if [ ${#tools_choice} -eq 1 ]; then
-            tools_choice="0$tools_choice"
-        fi
-        tools_choice="tool$tools_choice"
-    fi
-
     case $tools_choice in
-        tool1) 
-            echo "安装常用工具..."
-            if ! $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; then
-                echo "安装失败，请检查权限或网络连接"
-            else
-                echo "安装完成"
-            fi
-            show_basic_tools_menu 
-            ;;
-        tool2) 
-            echo "安装 Docker..."
-            if ! $PKG_INSTALL docker.io docker-compose; then
-                echo "Docker 安装失败"
-            else
-                sudo systemctl enable docker
-                sudo systemctl start docker
-                echo "Docker 安装完成"
-            fi
-            show_basic_tools_menu 
-            ;;
-        tool3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
-        tool4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
-        tool5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
-        tool6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
+        1|tool1) echo "安装常用工具..."; $PKG_INSTALL curl wget git vim unzip build-essential net-tools htop traceroute tmux; show_basic_tools_menu ;;
+        2|tool2) echo "安装 Docker..."; $PKG_INSTALL docker.io docker-compose; show_basic_tools_menu ;;
+        3|tool3) echo "安装开发工具..."; $PKG_INSTALL python3 python3-pip python3-venv openjdk-11-jdk gcc g++ make cmake; show_basic_tools_menu ;;
+        4|tool4) echo "安装网络工具..."; $PKG_INSTALL sshpass telnet nmap iperf3 dnsutils net-tools iputils-ping; show_basic_tools_menu ;;
+        5|tool5) echo "安装常用数据库..."; $PKG_INSTALL mysql-server postgresql redis-server mongodb; show_basic_tools_menu ;;
+        6|tool6) echo "安装 Node.js 和 npm..."; curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -; $PKG_INSTALL nodejs; show_basic_tools_menu ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_basic_tools_menu ;;
     esac
@@ -452,7 +421,7 @@ EOF
     show_system_menu
 }
 
-# ��性能优化模式
+# 性能优化模式
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -704,7 +673,7 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
-    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度���整体性能。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
     echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
@@ -749,30 +718,17 @@ show_script_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m脚本大全：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 安装 kejilion 脚本\033[0m"
-    echo -e "\033[1;37m02. 安装 勇哥的SB 脚本\033[0m"
+    echo -e "\033[1;37m1. 安装 kejilion 脚本\033[0m"
+    echo -e "\033[1;37m2. 安装 勇哥的SB 脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m00. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -p "输入选项编号或代码: " choice
 
-    # 如输入的是纯数字，自动添加script前缀
-    if [[ $choice =~ ^[0-9]+$ ]]; then
-        if [ "$choice" = "00" ]; then
-            show_main_menu
-            return
-        fi
-        # 将个位数转换为两位数格式
-        if [ ${#choice} -eq 1 ]; then
-            choice="0$choice"
-        fi
-        choice="script$choice"
-    fi
-
     case $choice in
-        script01) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
-        script02) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
-        00) show_main_menu ;;
+        1|script1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
+        2|script2) echo "安装 勇哥的SB 脚本..."; bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/sb.sh); show_script_menu ;;
+        0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
 }
@@ -783,62 +739,24 @@ show_app_market() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33m应用市场：\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m01. 宝塔面板官方版\033[0m"
-    echo -e "\033[1;37m02. aaPanel宝塔国际版\033[0m"
-    echo -e "\033[1;37m03. 1Panel新一代管理面板\033[0m"
-    echo -e "\033[1;37m04. 安装宝塔开心版\033[0m"
-    echo -e "\033[1;37m05. 还原到宝塔官方版\033[0m"
+    echo -e "\033[1;37m1. 宝塔面板官方版\033[0m"
+    echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
+    echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
+    echo -e "\033[1;37m4. 安装宝塔开心版\033[0m"
+    echo -e "\033[1;37m5. 还原到宝塔官方版\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m00. 返回主菜单\033[0m"
+    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     read -e -p "输入选项编号或代码: " choice
 
-    # 如果输入的是纯数字，自动添加app前缀
-    if [[ $choice =~ ^[0-9]+$ ]]; then
-        if [ "$choice" = "00" ]; then
-            show_main_menu
-            return
-        fi
-        # 将个位数转换为两位数格式
-        if [ ${#choice} -eq 1 ]; then
-            choice="0$choice"
-        fi
-        choice="app$choice"
-    fi
-
     case $choice in
-        app01)
-            echo "安装宝塔面板官方版..."
-            wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
-            show_app_market
-            ;;
-        app02)
-            echo "安装aaPanel宝塔国��版..."
-            wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel
-            show_app_market
-            ;;
-        app03)
-            echo "安装1Panel新一代管理面板..."
-            curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh
-            show_app_market
-            ;;
-        app04)
-            echo "安装宝塔开心版..."
-            curl http://io.bt.sy/install/update6.sh|bash
-            show_app_market
-            ;;
-        app05)
-            echo "还原到宝塔官方版..."
-            curl http://download.bt.cn/install/update6.sh|bash
-            show_app_market
-            ;;
-        00)
-            show_main_menu
-            ;;
-        *)
-            echo "无效选项，请重试。"
-            show_app_market
-            ;;
+        1|app1) echo "安装宝塔面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
+        2|app2) echo "安装aaPanel宝塔国际版..."; wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel; show_app_market ;;
+        3|app3) echo "安装1Panel新一代管理面板..."; curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh; show_app_market ;;
+        4|app4) echo "安装宝塔开心版..."; curl http://io.bt.sy/install/update6.sh|bash; show_app_market ;;
+        5|app5) echo "还原到宝塔官方版..."; curl http://download.bt.cn/install/update6.sh|bash; show_app_market ;;
+        0) show_main_menu ;;
+        *) echo "无效选项，请重试。"; show_app_market ;;
     esac
 }
 
@@ -883,7 +801,7 @@ enable_root_key() {
     sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
     sudo sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     
-    # 重启 SSH 服务
+    # ��启 SSH 服务
     sudo systemctl restart sshd
     
     # 复制私钥到当前用户目录
