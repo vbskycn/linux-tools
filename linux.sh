@@ -68,6 +68,7 @@ show_script_menu() {
 
 # 检查并复制脚本到系统程序目录
 install_script() {
+    echo "Starting install_script function..."
     if [ ! -f /usr/local/bin/linux-tools ]; then
         sudo cp $(realpath $0) /usr/local/bin/linux-tools
         sudo chmod +x /usr/local/bin/linux-tools
@@ -81,10 +82,13 @@ install_script() {
     fi
     source ~/.bashrc
     echo "快捷命令 'v' 已生效。"
+    echo "Finished install_script function."
 }
 
 # 运行安装脚本
 install_script
 
 # 启动菜单
+echo "Starting main menu..."
 show_main_menu
+echo "Exiting script."
