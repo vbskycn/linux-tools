@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.92 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.93 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -304,73 +304,51 @@ show_basic_tools_menu() {
 # 系统相关菜单
 show_system_menu() {
     clear
-    echo "=============================="
-    echo "系统相关选项："
-    echo "=============================="
-    echo "1. 更新系统"
-    echo "2. 清理不再需要的软件包"
-    echo "3. 更改系统名"
-    echo "4. 设置快捷键"
-    echo "5. 设置虚拟内存"
-    echo "6. 设置SSH端口"
-    echo "7. 开放所有端口"
-    echo "8. 设置时区"
-    echo "9. 优化DNS"
-    echo "10. 高性能优化模式"
-    echo "11. 均衡优化模式"
-    echo "12. 网站优化模式"
-    echo "13. 还原默认设置"
-    echo -e "\033[1;34m--------------------\033[0m"
-    echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33m系统相关选项：\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;37m1. 更新系统\033[0m"
+    echo -e "\033[1;37m2. 清理不再需要的软件包\033[0m"
+    echo -e "\033[1;37m3. 更改系统名\033[0m"
+    echo -e "\033[1;37m4. 设置快捷键V\033[0m"
+    echo -e "\033[1;37m5. 设置虚拟内存\033[0m"
+    echo -e "\033[1;37m6. 设置SSH端口\033[0m"
+    echo -e "\033[1;37m7. 开放所有端口\033[0m"
+    echo -e "\033[1;37m8. 设置时区\033[0m"
+    echo -e "\033[1;37m9. 优化DNS\033[0m"
+    echo -e "\033[1;37m10. linux内核优化-高性能优化模式\033[0m"
+    echo -e "\033[1;37m11. linux内核优化-均衡优化模式\033[0m"
+    echo -e "\033[1;37m12. linux内核优化-网站优化模式\033[0m"
+    echo -e "\033[1;37m13. linux内核优化-还原默认设置\033[0m"
+    echo -e "\033[1;37m14. 开启root密码登入\033[0m"
+    echo -e "\033[1;37m15. 开启root密钥登入\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
+    echo -e "\033[1;32m0. 返回上级\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
     read -p "输入选项编号或代码: " choice
 
     case $choice in
-        1|sys1) 
-            update_system
-            ;;
-        2|sys2) 
-            clean_packages
-            ;;
-        3|sys3) 
-            change_hostname
-            ;;
-        4|sys4) 
-            set_shortcut
-            ;;
-        5|sys5) 
-            set_swap
-            ;;
-        6|sys6) 
-            set_ssh_port
-            ;;
-        7|sys7) 
-            open_ports
-            ;;
-        8|sys8) 
-            set_timezone
-            ;;
-        9|sys9) 
-            optimize_dns
-            ;;
-        10|sys10) 
-            optimize_high_performance
-            ;;
-        11|sys11) 
-            optimize_balanced
-            ;;
-        12|sys12) 
-            optimize_web_server
-            ;;
-        13|sys13) 
-            restore_defaults
-            ;;
-        0) 
-            show_main_menu
-            ;;
+        1|sys1) update_system ;;
+        2|sys2) clean_packages ;;
+        3|sys3) change_hostname ;;
+        4|sys4) set_shortcut ;;
+        5|sys5) set_swap ;;
+        6|sys6) set_ssh_port ;;
+        7|sys7) open_ports ;;
+        8|sys8) set_timezone ;;
+        9|sys9) optimize_dns ;;
+        10|sys10) optimize_high_performance ;;
+        11|sys11) optimize_balanced ;;
+        12|sys12) optimize_web_server ;;
+        13|sys13) restore_defaults ;;
+        14|sys14) enable_root_password ;;
+        15|sys15) enable_root_key ;;
+        0) show_main_menu ;;
         *) 
             echo "无效选项，请重试。"
-            show_system_menu
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_system_menu 
             ;;
     esac
 }
@@ -428,15 +406,24 @@ change_hostname() {
     show_system_menu
 }
 
-# 设置快捷键
+# 设置快捷键V
 set_shortcut() {
-    echo "正在设置快捷键..."
-    ALIAS_CMD='alias v="/usr/local/bin/linux-tools"'
+    echo "正在设置快捷键V..."
+    
+    # 设置系统级别的别名
     if [ -d "/etc/profile.d" ]; then
-        echo "$ALIAS_CMD" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+        echo 'alias v="/usr/local/bin/linux-tools"' | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
         sudo chmod +x /etc/profile.d/linux-tools-alias.sh
-        echo "已添加到系统级置，所有用户都可以使用此快捷键"
     fi
+    
+    # 设置当前用户的别名
+    if [ -f "$HOME/.bashrc" ]; then
+        sed -i '/^alias v=/d' "$HOME/.bashrc"
+        echo 'alias v="/usr/local/bin/linux-tools"' >> "$HOME/.bashrc"
+        source "$HOME/.bashrc" 2>/dev/null || true
+    fi
+    
+    echo "快捷键V设置完成！现在可以使用 v 命令快速启动脚本"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -456,18 +443,49 @@ set_swap() {
         return
     fi
     
+    # 检查是否已存在swap
+    if swapon -s | grep -q "/swapfile"; then
+        echo "检测到已存在虚拟内存，正在关闭..."
+        sudo swapoff /swapfile
+        sudo rm -f /swapfile
+    fi
+    
+    echo "正在创建 ${swap_size}GB 虚拟内存..."
+    
     # 创建swap文件
-    sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap_size
+    if ! sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap_size status=progress; then
+        echo "创建虚拟内存文件失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 设置权限和创建swap
     sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
+    if ! sudo mkswap /swapfile; then
+        echo "初始化虚拟内存失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 启用swap
+    if ! sudo swapon /swapfile; then
+        echo "启用虚拟内存失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
     # 添加到 fstab
     if ! grep -q "/swapfile" /etc/fstab; then
         echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     fi
     
-    echo "虚拟内存设置完成！"
+    echo "虚拟内存设置完成！大小: ${swap_size}GB"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -475,7 +493,16 @@ set_swap() {
 
 # 设置SSH端口
 set_ssh_port() {
-    read -p "请输入新的SSH端口号(1-65535): " new_port
+    # 显示当前SSH端口
+    current_port=$(grep -E "^Port\s+[0-9]+" /etc/ssh/sshd_config | awk '{print $2}')
+    if [ -z "$current_port" ]; then
+        current_port="22 (默认)"
+    fi
+    echo "当前SSH端口: $current_port"
+    
+    # 提示用户输入新端口，默认为5522
+    read -p "请输入新的SSH端口号(1-65535) [默认: 5522]: " new_port
+    new_port=${new_port:-5522}  # 如果用户直接回车，使用默认值5522
     
     # 检查端口号是否有效
     if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1 ] || [ "$new_port" -gt 65535 ]; then
@@ -495,20 +522,37 @@ set_ssh_port() {
         return
     fi
     
-    if ! sed -i "s/#Port 22/Port $new_port/" /etc/ssh/sshd_config || \
-       ! sed -i "s/Port [0-9]*/Port $new_port/" /etc/ssh/sshd_config; then
-        echo "修改 SSH 配置失败"
+    # 备份SSH配置文件
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    
+    # 修改SSH端口
+    sudo sed -i "s/^#*Port .*/Port $new_port/" /etc/ssh/sshd_config
+    
+    # 检查配置文件语法
+    if ! sudo sshd -t; then
+        echo "SSH配置文件语法检查失败，正在还原备份..."
+        sudo mv /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
         return
     fi
     
-    if ! systemctl restart sshd; then
-        echo "重启 SSH 服务失败"
-    else
-        echo "SSH端口已更改为: $new_port"
+    # 重启SSH服务
+    if ! sudo systemctl restart sshd; then
+        echo "重启SSH服务失败，正在还原备份..."
+        sudo mv /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
+        sudo systemctl restart sshd
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
     fi
+    
+    echo "SSH端口已成功更改！"
+    echo "原端口: $current_port"
+    echo "新端口: $new_port"
+    echo -e "\033[33m请确保在防火墙中开放新端口，并记住新的端口号\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -554,11 +598,12 @@ open_ports() {
 
 # 设置时区为上海
 set_timezone() {
-    echo "正在设置时区为上海..."
+    echo "正在自动设置时区为上海..."
     if ! sudo timedatectl set-timezone Asia/Shanghai; then
         echo "设置时区失败"
     else
-        echo "时区已设置为上海"
+        echo "时区已自动设置为上海"
+        echo "当前时间: $(date '+%Y-%m-%d %H:%M:%S')"
     fi
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
@@ -568,17 +613,32 @@ set_timezone() {
 # 优化DNS
 optimize_dns() {
     echo "正在优化DNS设置..."
-    # 备份原始文件
-    cp /etc/resolv.conf /etc/resolv.conf.bak
     
-    # 设置新的DNS服务器
-    cat > /etc/resolv.conf << EOF
-nameserver 8.8.8.8
-nameserver 8.8.4.4
-nameserver 1.1.1.1
+    # 备份原始文件
+    sudo cp /etc/resolv.conf /etc/resolv.conf.bak
+    
+    # 检查IP是否在中国
+    local ip_info=$(curl -s https://ipapi.co/json/)
+    local country=$(echo "$ip_info" | grep -o '"country": "[^"]*' | cut -d'"' -f4)
+    
+    # 根据地理位置设置DNS
+    if [ "$country" = "CN" ]; then
+        echo "检测到服务器在中国，使用国内DNS..."
+        cat > /etc/resolv.conf << EOF
+nameserver 223.5.5.5
+nameserver 114.114.114.114
 EOF
+    else
+        echo "检测到服务器在国外，使用国际DNS..."
+        cat > /etc/resolv.conf << EOF
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+EOF
+    fi
     
     echo "DNS优化完成！"
+    echo "当前DNS服务器:"
+    cat /etc/resolv.conf | grep nameserver
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -602,7 +662,7 @@ kernel.pid_max = 65535
 kernel.shmmax = 68719476736
 # 在任何给时刻，系统上可以使用的共享内存的总量
 kernel.shmall = 4294967296
-# 设置消息队列
+# ���置消息队列
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
 
@@ -830,7 +890,7 @@ EOF
 # End of file
 EOF
 
-    echo "系��设置已还原为默认值！"
+    echo "系统设置已还原为默认值！"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -844,7 +904,7 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     大化系统性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡优化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
-    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
     echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
@@ -979,20 +1039,47 @@ show_app_market() {
 enable_root_password() {
     echo "正在配置root密码登入..."
     
+    # 检查是否有root权限
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要root权限来修改配置"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
     # 修改 SSH 配置允许 root 登录
-    sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-    sudo sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || \
+       ! sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config; then
+        echo "修改SSH配置失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
     # 重启 SSH 服务
-    sudo systemctl restart sshd
+    if ! systemctl restart sshd; then
+        echo "重启SSH服务失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    # 提示用户修改root密码
+    # 设置root密码
     echo -e "\033[33m请设置root用户密码...\033[0m"
-    sudo passwd root
+    if ! passwd root; then
+        echo "设置root密码失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    echo -e "\033[32mroot密码登入已启用！\033[0m"
-    read -n 1 -s -r -p "按任意键继续..."
-    echo
+    echo -e "\033[32mroot密码登入已成功启用！\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
@@ -1000,34 +1087,70 @@ enable_root_password() {
 enable_root_key() {
     echo "正在配置root密钥登入..."
     
+    # 检查是否有root权限
+    if [ "$(id -u)" != "0" ]; then
+        echo "需要root权限来修改配置"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
     # 生成密钥对
     KEY_FILE="$HOME/id_rsa_root"
-    ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q
+    if ! ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q; then
+        echo "生成SSH密钥对失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    # 确保root的.ssh目录存在
-    sudo mkdir -p /root/.ssh
-    sudo chmod 700 /root/.ssh
+    # 配置root的SSH目录
+    if ! mkdir -p /root/.ssh || ! chmod 700 /root/.ssh; then
+        echo "创建root的SSH目录失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
     # 添加公钥到authorized_keys
-    sudo cp "$KEY_FILE.pub" /root/.ssh/authorized_keys
-    sudo chmod 600 /root/.ssh/authorized_keys
+    if ! cp "$KEY_FILE.pub" /root/.ssh/authorized_keys || ! chmod 600 /root/.ssh/authorized_keys; then
+        echo "配置authorized_keys失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    # 修改 SSH 配置
-    sudo sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-    sudo sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    # 修改SSH配置
+    if ! sed -i 's/#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config || \
+       ! sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config; then
+        echo "修改SSH配置失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    # 重启 SSH 服务
-    sudo systemctl restart sshd
+    # 重启SSH服务
+    if ! systemctl restart sshd; then
+        echo "重启SSH服务失败"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
     
-    # 复制私钥到当前用户目录
-    cp "$KEY_FILE" "$HOME/"
-    chmod 600 "$HOME/id_rsa_root"
+    # 设置私钥权限
+    chmod 600 "$KEY_FILE"
     
-    echo -e "\033[32mroot密钥登入已配置完成！\033[0m"
-    echo -e "\033[33m私钥文件已保存到$HOME/id_rsa_root\033[0m"
+    echo -e "\033[32mroot密钥登入配置成功！\033[0m"
+    echo -e "\033[33m私钥文件已保存到: $KEY_FILE\033[0m"
     echo -e "\033[33m请妥善保管私钥文件，建议下载后删除服务器上的私钥\033[0m"
-    read -n 1 -s -r -p "按任意键继续..."
-    echo
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
     show_system_menu
 }
 
