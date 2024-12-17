@@ -7112,6 +7112,18 @@ linux_panel() {
 	done
 }
 
+		  0)
+			  kejilion
+			  ;;
+		  *)
+			  echo "无效的输入!"
+			  ;;
+	  esac
+	  break_end
+
+	done
+}
+
 
 linux_work() {
 

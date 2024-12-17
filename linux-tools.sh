@@ -74,6 +74,7 @@ show_main_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 系统相关\033[0m"
     echo -e "\033[1;37m2. 脚本大全\033[0m"
+    echo -e "\033[1;37m3. 应用市场\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m00. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -84,6 +85,7 @@ show_main_menu() {
     case $main_choice in
         1) show_system_menu ;;
         2) show_script_menu ;;
+        3) show_app_market ;;
         00) curl -sS -O https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux-tools.sh && \
             chmod +x linux-tools.sh && \
             sudo mv linux-tools.sh /usr/local/bin/linux-tools && \
@@ -151,6 +153,131 @@ show_script_menu() {
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_script_menu ;;
     esac
+}
+
+# 应用市场菜单
+show_app_market() {
+    while true; do
+        clear
+        echo -e "\033[1;33m应用市场\033[0m"
+        echo -e "\033[1;34m==============================\033[0m"
+        echo -e "\033[1;37m1. 宝塔面板官方版\033[0m"
+        echo -e "\033[1;37m2. aaPanel宝塔国际版\033[0m"
+        echo -e "\033[1;37m3. 1Panel新一代管理面板\033[0m"
+        echo -e "\033[1;34m==============================\033[0m"
+        echo -e "\033[1;31m0. 返回主菜单\033[0m"
+        echo -e "\033[1;34m==============================\033[0m"
+        read -e -p "请输入你的选择: " sub_choice
+
+        case $sub_choice in
+            1)
+                # 宝塔面板官方版
+                docker_app_install "baota" \
+                    "宝塔面板官方版" \
+                    "8888" \
+                    "wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec" \
+                    "宝塔面板是一款简单好用的服务器运维管理面板" \
+                    "https://www.bt.cn" \
+                    "echo \"" \
+                    "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+                ;;
+            2)
+                # aaPanel宝塔国际版
+                docker_app_install "aapanel" \
+                    "aaPanel宝塔国际版" \
+                    "7800" \
+                    "wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel" \
+                    "aaPanel是宝塔面板的国际版，没有广告，界面更简洁" \
+                    "https://www.aapanel.com/" \
+                    "echo \"" \
+                    "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+                ;;
+            3)
+                # 1Panel新一代管理面板
+                docker_app_install "1panel" \
+                    "fit2cloud/1panel" \
+                    "38282" \
+                    "curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh" \
+                    "1Panel是一个现代化、开源的 Linux 服务器运维管理面板" \
+                    "https://1panel.cn/" \
+                    "" \
+                    ""
+                ;;
+            0)
+                break
+                ;;
+            *)
+                echo "无效选项，请重试。"
+                ;;
+        esac
+    done
+}
+
+# 通用Docker应用安装函数
+docker_app_install() {
+    local name=$1
+    local image=$2
+    local port=$3
+    local run_cmd=$4
+    local description=$5
+    local url=$6
+    local use_cmd=$7
+    local passwd_cmd=$8
+
+    while true; do
+        check_docker_app
+        check_docker_image_update $name
+        clear
+        echo -e "$description $check_docker $update_status"
+        echo "官网介绍: $url"
+        
+        if docker inspect "$name" &>/dev/null; then
+            check_docker_app_ip
+        fi
+        echo ""
+
+        echo "------------------------"
+        echo "1. 安装           2. 更新           3. 卸载"
+        echo "------------------------"
+        echo "5. 域名访问"
+        echo "------------------------"
+        echo "0. 返回上一级"
+        echo "------------------------"
+        read -e -p "输入你的选择: " choice
+
+        case $choice in
+            1)
+                install_docker
+                eval "$run_cmd"
+                if [ ! -z "$use_cmd" ]; then
+                    eval "$use_cmd"
+                fi
+                if [ ! -z "$passwd_cmd" ]; then
+                    eval "$passwd_cmd"
+                fi
+                ;;
+            2)
+                docker rm -f $name
+                docker rmi -f $image
+                eval "$run_cmd"
+                ;;
+            3)
+                docker rm -f $name
+                docker rmi -f $image
+                rm -rf /home/docker/$name
+                echo "应用已卸载"
+                ;;
+            5)
+                echo "${name}域名访问设置"
+                add_yuming
+                ldnmp_Proxy ${yuming} ${ipv4_address} ${port}
+                ;;
+            *)
+                break
+                ;;
+        esac
+        break_end
+    done
 }
 
 # 检查并复制脚本到系统程序目录
