@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# 自动更新脚本到 /usr/local/bin/
+if [ "$0" != "/usr/local/bin/linux-tools" ]; then
+    echo "更新脚本到 /usr/local/bin/..."
+    curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh
+    chmod +x linux.sh
+    sudo mv linux.sh /usr/local/bin/linux-tools
+    exec /usr/local/bin/linux-tools "$@"
+    exit
+fi
+
 # 显示主菜单
 show_main_menu() {
     echo -e "\033[1;34m==============================\033[0m"
@@ -50,7 +60,10 @@ show_system_menu() {
         8) echo "清理不再需要的软件包..."; sudo apt autoremove -y ;;
         9) read -p "输入新的系统名: " new_hostname; sudo hostnamectl set-hostname "$new_hostname"; echo "系统名已更改为 $new_hostname" ;;
         10) echo "设置快捷键 v..."; echo "alias v='/usr/local/bin/linux-tools'" >> ~/.bashrc; source ~/.bashrc; echo "快捷键 'v' 已设置为 'source ~/.bashrc'" ;;
-        00) echo "更新本脚本..."; curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && sudo mv linux.sh /usr/local/bin/linux-tools && /usr/local/bin/linux-tools ;;
+        00) curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && \
+            chmod +x linux.sh && \
+            sudo mv linux.sh /usr/local/bin/linux-tools && \
+            /usr/local/bin/linux-tools ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
