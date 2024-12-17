@@ -14,7 +14,7 @@ echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___
 
 # 分割线与脚本信息
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.27 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.28 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -139,6 +139,7 @@ show_system_menu() {
     echo -e "\033[1;37m7. 开放所有端口\033[0m"
     echo -e "\033[1;37m8. 设置时区为上海\033[0m"
     echo -e "\033[1;37m9. 自动优化DNS地址\033[0m"
+    echo -e "\033[1;37m10. 系统内核优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -251,9 +252,304 @@ nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
             sudo chattr +i /etc/resolv.conf
             echo "DNS设置已完成并已防止自动修改"
             show_system_menu ;;
+        10)
+            show_kernel_optimize
+            ;;
         0) show_main_menu ;;
         *) echo "无效选项，请重试。"; show_system_menu ;;
     esac
+}
+
+# 高性能优化模式
+optimize_high_performance() {
+    # 系统参数优化
+    cat > /etc/sysctl.conf << EOF
+# 系统级别的能够打开的文件描述符数量
+fs.file-max = 1000000
+# 单个进程能够打开的文件描述符数量
+fs.nr_open = 1000000
+
+# 内核 panic 时如何处理
+kernel.panic = 10
+kernel.panic_on_oops = 1
+# 允许更多的PIDs
+kernel.pid_max = 65535
+# 内核所允许的最大共享内存段的大小
+kernel.shmmax = 68719476736
+# 在任何给定时刻，系统上可以使用的共享内存的总量
+kernel.shmall = 4294967296
+# 设置消息队列
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+
+# 设置最大线程数
+kernel.threads-max = 30000
+
+# 网络相关参数
+# 允许更多的网络连接
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 65535
+# 调整网络缓冲区大小
+net.core.wmem_max = 16777216
+net.core.rmem_max = 16777216
+net.core.wmem_default = 262144
+net.core.rmem_default = 262144
+
+# TCP参数优化
+net.ipv4.tcp_max_syn_backlog = 65535
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_tw_buckets = 65535
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_keepalive_time = 1200
+net.ipv4.tcp_keepalive_intvl = 15
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_mem = 94500000 915000000 927000000
+net.ipv4.tcp_wmem = 4096 87380 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_fastopen = 3
+
+# 虚拟内存参数
+vm.swappiness = 10
+vm.dirty_ratio = 60
+vm.dirty_background_ratio = 30
+vm.max_map_count = 262144
+EOF
+
+    # 应用系统参数
+    sysctl -p
+
+    # 设置系统限制
+    cat > /etc/security/limits.conf << EOF
+* soft nofile 1000000
+* hard nofile 1000000
+* soft nproc 65535
+* hard nproc 65535
+* soft memlock unlimited
+* hard memlock unlimited
+EOF
+
+    echo "高性能优化模式配置完成！"
+}
+
+# 均衡优化模式
+optimize_balanced() {
+    # 系统参数优化（均衡模式）
+    cat > /etc/sysctl.conf << EOF
+# 文件描述符限制
+fs.file-max = 500000
+fs.nr_open = 500000
+
+# 内核参数
+kernel.panic = 10
+kernel.pid_max = 32768
+kernel.threads-max = 15000
+
+# 网络参数
+net.core.somaxconn = 32768
+net.core.netdev_max_backlog = 32768
+net.core.wmem_max = 8388608
+net.core.rmem_max = 8388608
+net.core.wmem_default = 131072
+net.core.rmem_default = 131072
+
+# TCP参数
+net.ipv4.tcp_max_syn_backlog = 32768
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_tw_buckets = 32768
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_keepalive_time = 1200
+net.ipv4.tcp_mem = 47250000 457500000 463500000
+net.ipv4.tcp_wmem = 4096 65536 8388608
+net.ipv4.tcp_rmem = 4096 65536 8388608
+
+# 虚拟内存参数
+vm.swappiness = 30
+vm.dirty_ratio = 40
+vm.dirty_background_ratio = 20
+vm.max_map_count = 131072
+EOF
+
+    sysctl -p
+
+    # 设置系统限制
+    cat > /etc/security/limits.conf << EOF
+* soft nofile 500000
+* hard nofile 500000
+* soft nproc 32768
+* hard nproc 32768
+EOF
+
+    echo "均衡优化模式配置完成！"
+}
+
+# 网站优化模式
+optimize_web_server() {
+    # 系统参数优化（网站服务器模式）
+    cat > /etc/sysctl.conf << EOF
+# 文件描述符限制
+fs.file-max = 2000000
+fs.nr_open = 2000000
+
+# 网络参数
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 65535
+net.core.wmem_max = 16777216
+net.core.rmem_max = 16777216
+
+# TCP参数
+net.ipv4.tcp_max_syn_backlog = 65535
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_tw_buckets = 65535
+net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_keepalive_time = 600
+net.ipv4.tcp_keepalive_intvl = 10
+net.ipv4.tcp_keepalive_probes = 3
+net.ipv4.tcp_mem = 94500000 915000000 927000000
+net.ipv4.tcp_wmem = 4096 87380 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_fastopen = 3
+
+# 虚拟内存参数
+vm.swappiness = 10
+vm.dirty_ratio = 60
+vm.dirty_background_ratio = 30
+EOF
+
+    sysctl -p
+
+    # 设置系统限制
+    cat > /etc/security/limits.conf << EOF
+* soft nofile 2000000
+* hard nofile 2000000
+* soft nproc 65535
+* hard nproc 65535
+EOF
+
+    echo "网站服务器优化模式配置完成！"
+}
+
+# 还原默认设置
+restore_defaults() {
+    # 还原 sysctl.conf
+    cat > /etc/sysctl.conf << EOF
+# 保持系统默认值
+EOF
+
+    sysctl -p
+
+    # 还原 limits.conf
+    cat > /etc/security/limits.conf << EOF
+# /etc/security/limits.conf
+#
+#Each line describes a limit for a user in the form:
+#
+#<domain>        <type>  <item>  <value>
+#
+#Where:
+#<domain> can be:
+#        - a user name
+#        - a group name, with @group syntax
+#        - the wildcard *, for default entry
+#        - the wildcard %, can be also used with %group syntax,
+#                 for maxlogin limit
+#        - NOTE: group and wildcard limits are not applied to root.
+#          To apply a limit to the root user, <domain> must be
+#          the literal username root.
+#
+#<type> can have the two values:
+#        - "soft" for enforcing the soft limits
+#        - "hard" for enforcing hard limits
+#
+#<item> can be one of the following:
+#        - core - limits the core file size (KB)
+#        - data - max data size (KB)
+#        - fsize - maximum filesize (KB)
+#        - memlock - max locked-in-memory address space (KB)
+#        - nofile - max number of open files
+#        - rss - max resident set size (KB)
+#        - stack - max stack size (KB)
+#        - cpu - max CPU time (MIN)
+#        - nproc - max number of processes
+#        - as - address space limit (KB)
+#        - maxlogins - max number of logins for this user
+#        - maxsyslogins - max number of logins on the system
+#        - priority - the priority to run user process with
+#        - locks - max number of file locks the user can hold
+#        - sigpending - max number of pending signals
+#        - msgqueue - max memory used by POSIX message queues (bytes)
+#        - nice - max nice priority allowed to raise to values: [-20, 19]
+#        - rtprio - max realtime priority
+#        - chroot - change root to directory (Debian-specific)
+#
+#<domain>      <type>  <item>         <value>
+#
+
+#*               soft    core            0
+#root            hard    core            100000
+#*               hard    rss             10000
+#@student        hard    nproc           20
+#@faculty        soft    nproc           20
+#@faculty        hard    nproc           50
+#ftp             hard    nproc           0
+#ftp             -       chroot          /ftp
+#@student        -       maxlogins       4
+
+# End of file
+EOF
+
+    echo "系统设置已还原为默认值！"
+}
+
+# 内核优化菜单
+show_kernel_optimize() {
+    clear
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
+    echo -e "\033[1;34m==============================\033[0m"
+    echo -e "\033[1;37m视频介绍: https://www.bilibili.com/video/BV1Kb421J7yg?t=0.1\033[0m"
+    echo -e "\033[1;34m------------------------------------------------\033[0m"
+    echo -e "\033[1;37m提供多种系统参数调优模式，用户可以根据自身使用场景进行选择切换。\033[0m"
+    echo -e "\033[1;33m提示: \033[1;37m生产环境请谨慎使用！\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对网站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
+    echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
+    echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
+    echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
+    echo -e "\033[1;32m0. 返回上一级\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
+    read -e -p "请输入你的选择: " kernel_choice
+
+    case $kernel_choice in
+        1)
+            optimize_high_performance
+            ;;
+        2)
+            optimize_balanced
+            ;;
+        3)
+            optimize_web_server
+            ;;
+        4)
+            optimize_high_performance
+            ;;
+        5)
+            optimize_high_performance
+            ;;
+        6)
+            restore_defaults
+            ;;
+        0)
+            return
+            ;;
+        *)
+            echo "无效选项，请重试。"
+            ;;
+    esac
+
+    read -n 1 -p "按任意键继续..."
 }
 
 # 脚本大全菜单
