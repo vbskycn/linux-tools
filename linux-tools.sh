@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.8 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.9 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -145,7 +145,8 @@ show_main_menu() {
     echo -e "\033[1;36m3. 脚本大全 (script)\033[0m"
     echo -e "\033[1;36m4. 应用市场 (app)\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;32m00. 更新脚本\033[0m"
+    echo -e "\033[1;34m--------------------\033[0m"
+    echo -e "\033[1;32m0. 更新脚本\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 退出程序\033[0m"
@@ -734,7 +735,7 @@ EOF
     show_system_menu
 }
 
-# 高性能优化模式
+# 添加高性能优化函数
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -748,11 +749,11 @@ kernel.panic = 10
 kernel.panic_on_oops = 1
 # 允许更多的PIDs
 kernel.pid_max = 65535
-# 内核所允许的最大共享内存段的小
+# 内核所允许的最大共享内存段的大小
 kernel.shmmax = 68719476736
-# 在任何给时刻，系统上可以使用的共享内存的总量
+# 在任何给定时刻，系统上可以使用的共享内存的总量
 kernel.shmall = 4294967296
-# 置消息队列
+# 设置消息队列
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
 
@@ -763,7 +764,7 @@ kernel.threads-max = 30000
 # 允许更多的网络连接
 net.core.somaxconn = 65535
 net.core.netdev_max_backlog = 65535
-# 调整络缓冲区大小
+# 调整网络缓冲区大小
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
 net.core.wmem_default = 262144
@@ -790,7 +791,7 @@ vm.max_map_count = 262144
 EOF
 
     # 应用系统参数
-    sysctl -p
+    sysctl -p > /dev/null 2>&1
 
     # 设置系统限制
     cat > /etc/security/limits.conf << EOF
@@ -801,11 +802,6 @@ EOF
 * soft memlock unlimited
 * hard memlock unlimited
 EOF
-
-    echo "高性能优化模式配置完成！"
-    echo -e "\033[1;32m按任意键返回...\033[0m"
-    read -n 1
-    show_system_menu
 }
 
 # 均衡优化模式
@@ -1278,7 +1274,7 @@ server_init() {
     
     # 7. 系统内核优化
     echo -e "\n\033[1;32m[7/13] 配置系统内核高性能优化模式...\033[0m"
-    optimize_high_performance > /dev/null 2>&1
+    optimize_high_performance
     
     # 8. 配置root密钥登入
     echo -e "\n\033[1;32m[8/13] 配置root密钥登入...\033[0m"
