@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.84 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.85 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -400,7 +400,7 @@ open_ports() {
         echo "需要 root 权限来配置防火墙"
         show_system_menu
         return
-    }
+    fi
     
     if [ -f /etc/debian_version ]; then
         if ! apt update || ! apt install -y ufw; then
@@ -452,7 +452,7 @@ EOF
     show_system_menu
 }
 
-# 高性能优化模式
+# ��性能优化模式
 optimize_high_performance() {
     # 系统参数优化
     cat > /etc/sysctl.conf << EOF
@@ -813,7 +813,7 @@ show_app_market() {
             show_app_market
             ;;
         app02)
-            echo "安装aaPanel宝塔国际版..."
+            echo "安装aaPanel宝塔国��版..."
             wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel
             show_app_market
             ;;
@@ -857,7 +857,7 @@ enable_root_password() {
     echo -e "\033[33m请设置root用户密码...\033[0m"
     sudo passwd root
     
-    echo -e "\033[32mroot密码登入已��启！\033[0m"
+    echo -e "\033[32mroot密码登入已启用！\033[0m"
     read -n 1 -s -r -p "按任意键继续..."
     echo
     show_system_menu
