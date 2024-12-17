@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.94 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.95 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -612,44 +612,41 @@ open_ports() {
     if [ -f /etc/debian_version ]; then
         echo "检测到 Debian/Ubuntu 系统，使用 ufw..."
         
-        # 安装 ufw
+        # 安装 ufw（如果未安装）
         if ! command -v ufw >/dev/null 2>&1; then
-            apt update && apt install -y ufw
+            apt update >/dev/null 2>&1 && apt install -y ufw >/dev/null 2>&1
         fi
         
-        # 配置 ufw 规则
-        ufw default allow outgoing
-        ufw default deny incoming
-        ufw allow ssh
+        # 关闭 ufw
+        ufw disable >/dev/null 2>&1
         
-        # 允许所有端口
-        for port in {1..65535}; do
-            ufw allow $port/tcp
-            ufw allow $port/udp
-        done
+        # 重置 ufw 规则
+        ufw --force reset >/dev/null 2>&1
+        
+        # 配置基本规则
+        ufw default allow outgoing >/dev/null 2>&1
+        ufw default allow incoming >/dev/null 2>&1
         
         # 启用 ufw
-        echo "y" | ufw enable
+        echo "y" | ufw enable >/dev/null 2>&1
         
-        echo "ufw 防火墙规则配置完成"
-        ufw status numbered
+        echo "ufw 防火墙已配置完成，所有端口已开放"
         
     elif [ -f /etc/redhat-release ]; then
         echo "检测到 RHEL/CentOS 系统，使用 firewalld..."
         
         # 确保 firewalld 已安装并运行
         if ! systemctl is-active --quiet firewalld; then
-            systemctl start firewalld
-            systemctl enable firewalld
+            systemctl start firewalld >/dev/null 2>&1
+            systemctl enable firewalld >/dev/null 2>&1
         fi
         
-        # 配置 firewalld 规则
-        firewall-cmd --zone=public --add-port=1-65535/tcp --permanent
-        firewall-cmd --zone=public --add-port=1-65535/udp --permanent
-        firewall-cmd --reload
+        # 配置防火墙规则
+        firewall-cmd --zone=public --add-port=1-65535/tcp --permanent >/dev/null 2>&1
+        firewall-cmd --zone=public --add-port=1-65535/udp --permanent >/dev/null 2>&1
+        firewall-cmd --reload >/dev/null 2>&1
         
-        echo "firewalld 防火墙规则配置完成"
-        firewall-cmd --list-all
+        echo "firewalld 防火墙已配置完成，所有端口已开放"
     fi
     
     echo "所有端口已开放完成！"
@@ -892,7 +889,7 @@ EOF
 
     sysctl -p
 
-    # ��原 limits.conf
+    # 还原 limits.conf
     cat > /etc/security/limits.conf << EOF
 # /etc/security/limits.conf
 #
@@ -964,7 +961,7 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 高性能优化模式：     大化系���性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
@@ -1161,7 +1158,7 @@ enable_root_key() {
     # 生成密钥对
     KEY_FILE="$HOME/id_rsa_root"
     if ! ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q; then
-        echo "���成SSH密钥对失败"
+        echo "生成SSH密钥对失败"
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
