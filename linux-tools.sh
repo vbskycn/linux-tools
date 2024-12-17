@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.7 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.71 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -718,39 +718,18 @@ show_app_market() {
 
     case $choice in
         1)
-            # 宝塔面板官方版
-            docker_app_install "baota" \
-                "宝塔面板官方版" \
-                "8888" \
-                "wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec" \
-                "宝塔面板是一款简单好用的服务器运维管理面板" \
-                "https://www.bt.cn" \
-                "echo \"" \
-                "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+            echo "安装宝塔面板官方版..."
+            wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec
             show_app_market
             ;;
         2)
-            # aaPanel宝塔国际版
-            docker_app_install "aapanel" \
-                "aaPanel宝塔国际版" \
-                "7800" \
-                "wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel" \
-                "aaPanel是宝塔面板的国际版，没有广告，界面更简洁" \
-                "https://www.aapanel.com/" \
-                "echo \"" \
-                "如果安装失败，大概率是因为系统太新，目前官方还不支持。\""
+            echo "安装aaPanel宝塔国际版..."
+            wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel
             show_app_market
             ;;
         3)
-            # 1Panel新一代管理面板
-            docker_app_install "1panel" \
-                "fit2cloud/1panel" \
-                "38282" \
-                "curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh" \
-                "1Panel是一个现代化、开源的 Linux 服务器运维管理面板" \
-                "https://1panel.cn/" \
-                "" \
-                ""
+            echo "安装1Panel新一代管理面板..."
+            curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh
             show_app_market
             ;;
         4)
@@ -778,51 +757,6 @@ show_app_market() {
             show_app_market
             ;;
     esac
-}
-
-# 安装宝塔开心版
-install_bt_happy() {
-    echo "正在安装宝塔开心版..."
-    
-    # 下载并执行宝塔开心版安装脚本
-    curl -sSO https://raw.githubusercontent.com/vbskycn/btpanel-v7.7.0/main/install/install_panel.sh
-    sudo bash install_panel.sh
-    
-    # 安装完成后执行优化命令
-    if [ -f /etc/init.d/bt ]; then
-        bt 14
-        bt 15
-        echo -e "\033[32m宝塔开心版安装完成！\033[0m"
-        echo -e "\033[33m面板地址: http://$(curl -s ipv4.icanhazip.com):8888\033[0m"
-        echo -e "\033[33m面板账号和密码已发送到您的服务器 /root/bt.txt\033[0m"
-    else
-        echo -e "\033[31m安装失败，请检查网络连接后重试\033[0m"
-    fi
-    
-    read -n 1 -s -r -p "按任意键继续..."
-    echo
-    show_app_market
-}
-
-# 还原宝塔官方版
-restore_bt_official() {
-    echo "正在还原到宝塔官方版..."
-    
-    # 下载并执行宝塔官方安装脚本
-    curl -sSO http://download.bt.cn/install/install_panel.sh
-    sudo bash install_panel.sh
-    
-    if [ -f /etc/init.d/bt ]; then
-        echo -e "\033[32m宝塔面板已还原到官方版！\033[0m"
-        echo -e "\033[33m面板地址: http://$(curl -s ipv4.icanhazip.com):8888\033[0m"
-        echo -e "\033[33m面板账号和密码已发送到您的服务器 /root/bt.txt\033[0m"
-    else
-        echo -e "\033[31m还原失败，请检查网络连接后重试\033[0m"
-    fi
-    
-    read -n 1 -s -r -p "按任意键继续..."
-    echo
-    show_app_market
 }
 
 # 开启root密码登入
