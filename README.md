@@ -33,7 +33,7 @@
 
 github 代理版本
 ```
-curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/linux.sh && chmod +x linux.sh && ./linux.sh
+curl -sS -O https://github.zhoujie218.top/https://raw.githubusercontent.com/vbskycn/linux-tools/main/zh/linux.sh && chmod +x linux.sh && ./linux.sh
 ```
 github 直连版本
 ```
