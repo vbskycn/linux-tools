@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.82 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.83 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -44,7 +44,7 @@ fi
 
 show_toolbox_info
 
-# 检查并复制脚本到系统程序目录
+# 检查并复制脚本到系统程序目��
 install_script() {
     # 获取脚本的绝对路径
     SCRIPT_PATH=$(readlink -f "$0")
@@ -311,7 +311,7 @@ clean_packages() {
 
 # 更改系统名
 change_hostname() {
-    read -p "请输入���的主机名: " new_hostname
+    read -p "请���入新的主机名: " new_hostname
     hostnamectl set-hostname $new_hostname
     echo "系统名已更改为: $new_hostname"
     show_system_menu
@@ -357,7 +357,7 @@ set_swap() {
         echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     fi
     
-    echo "虚拟���存设置完成！"
+    echo "���拟内存设置完成！"
     show_system_menu
 }
 
@@ -426,7 +426,7 @@ open_ports() {
 
 # 设置时区为上海
 set_timezone() {
-    echo "正在设置时区为上海..."
+    echo "正在设置时区为���海..."
     if ! sudo timedatectl set-timezone Asia/Shanghai; then
         echo "设置时区失败"
     else
@@ -468,7 +468,7 @@ kernel.panic_on_oops = 1
 kernel.pid_max = 65535
 # 内核所允许的最大共享内存段的大小
 kernel.shmmax = 68719476736
-# 在任何给��时刻，系统上可以使用的共享内存的总量
+# 在任何给时刻，系统上可以使用的共享内存的总量
 kernel.shmall = 4294967296
 # 设置消息队列
 kernel.msgmnb = 65536
@@ -481,7 +481,7 @@ kernel.threads-max = 30000
 # 允许更多的网络连接
 net.core.somaxconn = 65535
 net.core.netdev_max_backlog = 65535
-# 调整络缓冲区大小
+# 调整络缓冲区大���
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
 net.core.wmem_default = 262144
@@ -524,7 +524,7 @@ EOF
     show_kernel_optimize
 }
 
-# 均��优化模式
+# 均衡优化模式
 optimize_balanced() {
     # 系统参数优化（均衡模式）
     cat > /etc/sysctl.conf << EOF
@@ -704,7 +704,7 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;37m1. 高性能优化模式：     最大化系统性能，优化文件描述符、虚拟内存、网络设置、缓存管理和CPU设置。\033[0m"
     echo -e "\033[1;37m2. 均衡优化模式：       在性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
-    echo -e "\033[1;37m3. 网站优化模式：       针对网站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
+    echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
     echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
