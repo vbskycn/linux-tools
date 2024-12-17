@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.88 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.89 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -314,35 +314,53 @@ show_system_menu() {
     echo "=============================="
     read -p "输入选项编号或代码: " choice
 
-    # 如果输入的是纯数字，自动添加sys前缀
-    if [[ $choice =~ ^[0-9]+$ ]]; then
-        if [ "$choice" = "0" ]; then
-            show_main_menu
-            return
-        fi
-        # 将个位数转换为两位数格式
-        if [ ${#choice} -eq 1 ]; then
-            choice="0$choice"
-        fi
-        choice="sys$choice"
-    fi
-
     case $choice in
-        1|sys1) update_system ;;
-        2|sys2) clean_packages ;;
-        3|sys3) change_hostname ;;
-        4|sys4) set_shortcut ;;
-        5|sys5) set_swap ;;
-        6|sys6) set_ssh_port ;;
-        7|sys7) open_ports ;;
-        8|sys8) set_timezone ;;
-        9|sys9) optimize_dns ;;
-        10|sys10) optimize_high_performance ;;
-        11|sys11) optimize_balanced ;;
-        12|sys12) optimize_web_server ;;
-        13|sys13) restore_defaults ;;
-        0) show_main_menu ;;
-        *) echo "无效选项，请重试。"; show_system_menu ;;
+        1|sys1) 
+            update_system
+            ;;
+        2|sys2) 
+            clean_packages
+            ;;
+        3|sys3) 
+            change_hostname
+            ;;
+        4|sys4) 
+            set_shortcut
+            ;;
+        5|sys5) 
+            set_swap
+            ;;
+        6|sys6) 
+            set_ssh_port
+            ;;
+        7|sys7) 
+            open_ports
+            ;;
+        8|sys8) 
+            set_timezone
+            ;;
+        9|sys9) 
+            optimize_dns
+            ;;
+        10|sys10) 
+            optimize_high_performance
+            ;;
+        11|sys11) 
+            optimize_balanced
+            ;;
+        12|sys12) 
+            optimize_web_server
+            ;;
+        13|sys13) 
+            restore_defaults
+            ;;
+        0) 
+            show_main_menu
+            ;;
+        *) 
+            echo "无效选项，请重试。"
+            show_system_menu
+            ;;
     esac
 }
 
@@ -783,7 +801,7 @@ show_kernel_optimize() {
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性能。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特殊需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
-    echo -e "\033[1;37m6. 还原默认设置：       将系��设置还原为默认配置。\033[0m"
+    echo -e "\033[1;37m6. 还原默认设置：       将系统设置还原为默认配置。\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回上级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
@@ -830,7 +848,7 @@ show_script_menu() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;32m0. 返回主菜单\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    read -p "输入选项��号或代码: " choice
+    read -p "输入选项编号或代码: " choice
 
     case $choice in
         1|script1) echo "安装 kejilion 脚本..."; curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh; show_script_menu ;;
@@ -857,7 +875,7 @@ show_app_market() {
     read -e -p "输入选项编号或代码: " choice
 
     case $choice in
-        1|app1) echo "安装宝���面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
+        1|app1) echo "安装宝塔面板官方版..."; wget -O install.sh https://download.bt.cn/install/install-ubuntu_6.0.sh && echo y | bash install.sh ed8484bec; show_app_market ;;
         2|app2) echo "安装aaPanel宝塔国际版..."; wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && echo y | bash install.sh aapanel; show_app_market ;;
         3|app3) echo "安装1Panel新一代管理面板..."; curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && bash quick_start.sh; show_app_market ;;
         4|app4) echo "安装宝塔开心版..."; curl http://io.bt.sy/install/update6.sh|bash; show_app_market ;;
@@ -879,7 +897,7 @@ enable_root_password() {
     sudo systemctl restart sshd
     
     # 提示用户修改root密码
-    echo -e "\033[33m请设置root用户��码...\033[0m"
+    echo -e "\033[33m请设置root用户密码...\033[0m"
     sudo passwd root
     
     echo -e "\033[32mroot密码登入已启用！\033[0m"
