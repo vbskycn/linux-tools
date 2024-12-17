@@ -11,7 +11,7 @@ echo -e "\033[1;34m | |    | || '_ \ | | | |\ \/ /_____ | | / _ \  / _ \ | |/ __
 echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
 echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
 echo -e "\033[1;34m==============================\033[0m"
-echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.93 只为更简单的Linux使用！\033[0m"
+echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.29.94 只为更简单的Linux使用！\033[0m"
 echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
 echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
 echo -e "\033[1;34m==============================\033[0m"
@@ -432,11 +432,31 @@ set_shortcut() {
 # 设置虚拟内存
 set_swap() {
     echo "正在设置虚拟内存..."
-    read -p "请输入要设置的虚拟内存大小(GB): " swap_size
+    
+    # 显示当前内存和swap使用情况
+    echo "当前内存使用情况:"
+    free -h
+    echo "------------------------"
+    
+    # 提示用户输入新的swap大小，默认为2GB
+    read -p "请输入要设置的虚拟内存大小(GB) [默认: 2]: " swap_size
+    swap_size=${swap_size:-2}  # 如果用户直接回车，使用默认值2
     
     # 检查输入是否为数字
     if ! [[ "$swap_size" =~ ^[0-9]+$ ]]; then
         echo "请输入有效的数字！"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+    
+    # 检查可用磁盘空间
+    available_space=$(df -BG / | awk 'NR==2 {print $4}' | tr -d 'G')
+    if [ "$available_space" -lt "$swap_size" ]; then
+        echo "错误: 磁盘空间不足！"
+        echo "可用空间: ${available_space}GB"
+        echo "需要空间: ${swap_size}GB"
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
@@ -452,19 +472,33 @@ set_swap() {
     
     echo "正在创建 ${swap_size}GB 虚拟内存..."
     
-    # 创建swap文件
-    if ! sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap_size status=progress; then
-        echo "创建虚拟内存文件失败"
+    # 使用fallocate创建swap文件（更快且更可靠）
+    if ! sudo fallocate -l ${swap_size}G /swapfile; then
+        echo "使用fallocate创建失败，尝试使用dd命令..."
+        # 如果fallocate失败，使用dd作为备选方案
+        if ! sudo dd if=/dev/zero of=/swapfile bs=1024K count=$((swap_size * 1024)) status=progress; then
+            echo "创建虚拟内存文件失败"
+            echo -e "\033[1;32m按任意键返回...\033[0m"
+            read -n 1
+            show_system_menu
+            return
+        fi
+    fi
+    
+    # 设置权限
+    if ! sudo chmod 600 /swapfile; then
+        echo "设置权限失败"
+        sudo rm -f /swapfile
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
         return
     fi
     
-    # 设置权限和创建swap
-    sudo chmod 600 /swapfile
+    # 创建swap
     if ! sudo mkswap /swapfile; then
         echo "初始化虚拟内存失败"
+        sudo rm -f /swapfile
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
@@ -474,6 +508,7 @@ set_swap() {
     # 启用swap
     if ! sudo swapon /swapfile; then
         echo "启用虚拟内存失败"
+        sudo rm -f /swapfile
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
@@ -485,7 +520,10 @@ set_swap() {
         echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     fi
     
-    echo "虚拟内存设置完成！大小: ${swap_size}GB"
+    echo "虚拟内存设置完成！"
+    echo "------------------------"
+    echo "当前内存和虚拟内存使用情况:"
+    free -h
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -560,6 +598,9 @@ set_ssh_port() {
 
 # 开放所有端口
 open_ports() {
+    echo "正在配置防火墙规则..."
+    
+    # 检查是否有 root 权限
     if [ "$(id -u)" != "0" ]; then
         echo "需要 root 权限来配置防火墙"
         echo -e "\033[1;32m按任意键返回...\033[0m"
@@ -569,28 +610,49 @@ open_ports() {
     fi
     
     if [ -f /etc/debian_version ]; then
-        if ! apt update || ! apt install -y ufw; then
-            echo "安装 ufw 失败"
-            echo -e "\033[1;32m按任意键返回...\033[0m"
-            read -n 1
-            show_system_menu
-            return
+        echo "检测到 Debian/Ubuntu 系统，使用 ufw..."
+        
+        # 安装 ufw
+        if ! command -v ufw >/dev/null 2>&1; then
+            apt update && apt install -y ufw
         fi
-        ufw allow all
-        ufw enable
+        
+        # 配置 ufw 规则
+        ufw default allow outgoing
+        ufw default deny incoming
+        ufw allow ssh
+        
+        # 允许所有端口
+        for port in {1..65535}; do
+            ufw allow $port/tcp
+            ufw allow $port/udp
+        done
+        
+        # 启用 ufw
+        echo "y" | ufw enable
+        
+        echo "ufw 防火墙规则配置完成"
+        ufw status numbered
+        
     elif [ -f /etc/redhat-release ]; then
-        if ! systemctl start firewalld; then
-            echo "启动 firewalld 失败"
-            echo -e "\033[1;32m按任意键返回...\033[0m"
-            read -n 1
-            show_system_menu
-            return
+        echo "检测到 RHEL/CentOS 系统，使用 firewalld..."
+        
+        # 确保 firewalld 已安装并运行
+        if ! systemctl is-active --quiet firewalld; then
+            systemctl start firewalld
+            systemctl enable firewalld
         fi
+        
+        # 配置 firewalld 规则
         firewall-cmd --zone=public --add-port=1-65535/tcp --permanent
         firewall-cmd --zone=public --add-port=1-65535/udp --permanent
         firewall-cmd --reload
+        
+        echo "firewalld 防火墙规则配置完成"
+        firewall-cmd --list-all
     fi
-    echo "所有端口已开放"
+    
+    echo "所有端口已开放完成！"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -658,11 +720,11 @@ kernel.panic = 10
 kernel.panic_on_oops = 1
 # 允许更多的PIDs
 kernel.pid_max = 65535
-# 内核所允许的最大共享内存段的大小
+# 内核所允许的最大共享内存段的小
 kernel.shmmax = 68719476736
 # 在任何给时刻，系统上可以使用的共享内存的总量
 kernel.shmall = 4294967296
-# ���置消息队列
+# 置消息队列
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
 
@@ -830,7 +892,7 @@ EOF
 
     sysctl -p
 
-    # 还原 limits.conf
+    # ��原 limits.conf
     cat > /etc/security/limits.conf << EOF
 # /etc/security/limits.conf
 #
@@ -902,8 +964,8 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 高性能优化模式：     大化系统性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m2. 均衡优化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     大化系���性能，优化文件描述符、虚拟内存、网络置、缓存管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m2. 均衡化模式：       性能与资源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
@@ -1099,7 +1161,7 @@ enable_root_key() {
     # 生成密钥对
     KEY_FILE="$HOME/id_rsa_root"
     if ! ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N "" -q; then
-        echo "生成SSH密钥对失败"
+        echo "���成SSH密钥对失败"
         echo -e "\033[1;32m按任意键返回...\033[0m"
         read -n 1
         show_system_menu
