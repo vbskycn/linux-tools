@@ -10,7 +10,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m\_____/|_|_| |_|\_/ \___| |_____|_| |_|___/\__|  \033[0m"
     echo -e "\033[1;34m                                               \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.2 只为更简单的Linux的使用！\033[0m"
+    echo -e "\033[1;33mlinux-tools脚本工具箱 v1.21 只为更简单的Linux的使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m-输入v可快速启动此脚本-\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
