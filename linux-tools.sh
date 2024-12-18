@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.15 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.16 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -1232,9 +1232,9 @@ server_init() {
     echo -e "\033[1;37m7. 系统内核优化为高性能模式\033[0m"
     echo -e "\033[1;37m8. 配置root密钥登入\033[0m"
     echo -e "\033[1;37m9. 设置2GB虚拟内存\033[0m"
-    echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
-    echo -e "\033[1;37m11. 设置时区为上海\033[0m"
-    echo -e "\033[1;37m12. 优化DNS配置\033[0m"
+    echo -e "\033[1;37m10. 设置时区为上海\033[0m"
+    echo -e "\033[1;37m11. 优化DNS配置\033[0m"
+    echo -e "\033[1;37m12. 开启root密码登入\033[0m"
     echo -e "\033[1;37m13. 清理不需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置。\033[0m"
     
@@ -1352,16 +1352,7 @@ server_init() {
     swapon /swapfile
     echo "/swapfile none swap sw 0 0" >> /etc/fstab
     
-    # 10. 设置SSH端口
-    echo -e "\n\033[1;32m[10/13] 设置SSH端口(5522)...\033[0m"
-    sed -i 's/^#*Port .*/Port 5522/' /etc/ssh/sshd_config
-    if [ -f /etc/debian_version ]; then
-        ufw allow 5522/tcp > /dev/null 2>&1
-    elif [ -f /etc/redhat-release ]; then
-        firewall-cmd --permanent --add-port=5522/tcp > /dev/null 2>&1
-        firewall-cmd --reload > /dev/null 2>&1
-    fi
-    systemctl restart sshd > /dev/null 2>&1
+
     
     # 11. 设置时区
     echo -e "\n\033[1;32m[11/13] 设置时区...\033[0m"
@@ -1385,25 +1376,54 @@ nameserver 8.8.8.8
 EOF
     fi
     
-    # 13. 清理软件包
+    # 13. 开启root密码登入并设置密码
+    echo -e "\n\033[1;32m[13/13] 开启root密码登入...\033[0m"
+    # 修改 SSH 配置允许 root 登录和密码认证
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    
+    # 重启 SSH 服务
+    systemctl restart sshd > /dev/null 2>&1
+    
+    # 设置root密码
+    echo "githubvbskycn" | passwd root --stdin 2>/dev/null || echo "githubvbskycn" | chpasswd
+    
+    # 清理软件包
     echo -e "\n\033[1;32m[13/13] 清理不再需要的软件包...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            apt-get autoremove -y -qq && apt-get clean -qq
+            timeout 60 apt-get autoremove -y -qq || true
+            timeout 30 apt-get clean -qq || true
             ;;
         centos|redhat|fedora|alma|rocky)
-            yum autoremove -y -q && yum clean all -q
+            timeout 60 yum autoremove -y -q || true
+            timeout 30 yum clean all -q || true
             ;;
         arch)
-            pacman -Sc --noconfirm --quiet
+            timeout 60 pacman -Sc --noconfirm --quiet || true
             ;;
         alpine)
-            apk cache clean
+            timeout 30 apk cache clean || true
             ;;
     esac
 
+    # 确保所有后台进程完成
+    wait
+
+    # 添加执行完成的确认
+    if [ -f "$LOG_FILE" ]; then
+        echo -e "\n配置完成时间: $(date)" >> "$LOG_FILE"
+        echo -e "系统信息: $(uname -a)" >> "$LOG_FILE"
+        echo -e "当前用户: $(whoami)" >> "$LOG_FILE"
+    fi
+
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;33m请查看日志文件了解详细信息：$LOG_FILE\033[0m"
+    
+    # 添加同步和刷新缓存
+    sync
+    
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
