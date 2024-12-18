@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.13 只为更简单的Linux使用！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.16 只为更简单的Linux使用！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -24,13 +24,30 @@ if [ "$0" != "/usr/local/bin/linux-tools" ]; then
         sudo chmod +x /usr/local/bin/linux-tools
         rm linux-tools.sh
         
-        # 更新别名设置
+        # 更新别名设置 - 修改这部分
         ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
+        # 添加到系统级别的别名文件
+        echo "$ALIAS_LINE" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+        sudo chmod +x /etc/profile.d/linux-tools-alias.sh
+        
+        # 同时添加到用户的 .bashrc
         if [ -f "$HOME/.bashrc" ]; then
             sed -i '/^alias v=/d' "$HOME/.bashrc"
             echo "$ALIAS_LINE" >> "$HOME/.bashrc"
-            source "$HOME/.bashrc" 2>/dev/null || true
         fi
+        
+        # 添加到 .bash_profile 以确保加载
+        if [ -f "$HOME/.bash_profile" ]; then
+            if ! grep -q "source.*\.bashrc" "$HOME/.bash_profile"; then
+                echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' >> "$HOME/.bash_profile"
+            fi
+        else
+            echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' > "$HOME/.bash_profile"
+        fi
+        
+        # 尝试立即生效别名
+        source "$HOME/.bashrc" 2>/dev/null || true
+        source /etc/profile.d/linux-tools-alias.sh 2>/dev/null || true
     else
         echo "脚本已是最新版本。"
         rm linux-tools.sh
@@ -41,7 +58,7 @@ fi
 
 show_toolbox_info
 
-# 检查并复制脚本到系统程序目录
+# 检查并复制脚本到系统程序目录 - 修改 install_script 函数
 install_script() {
     # 获取脚本的绝对路径
     SCRIPT_PATH=$(readlink -f "$0")
@@ -59,6 +76,10 @@ install_script() {
     
     # 设置别名
     ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
+    
+    # 添加到系统级别的别名文件
+    echo "$ALIAS_LINE" | sudo tee /etc/profile.d/linux-tools-alias.sh > /dev/null
+    sudo chmod +x /etc/profile.d/linux-tools-alias.sh
     
     # 更新 .bashrc
     if [ -f "$HOME/.bashrc" ]; then
@@ -80,10 +101,9 @@ install_script() {
         echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' > "$HOME/.bash_profile"
     fi
     
-    # 立即生效别名
+    # 尝试立即生效别名
     source "$HOME/.bashrc" 2>/dev/null || true
-    
-    #echo "脚本安装完成！"
+    source /etc/profile.d/linux-tools-alias.sh 2>/dev/null || true
 }
 
 # 运行安装脚本
@@ -327,7 +347,7 @@ show_system_menu() {
     echo -e "\033[1;37m5. 设置虚拟内存\033[0m"
     echo -e "\033[1;37m6. 设置SSH端口\033[0m"
     echo -e "\033[1;37m7. 开放所有端口\033[0m"
-    echo -e "\033[1;37m8. 设置时区\033[0m"
+    echo -e "\033[1;37m8. 设置时区为上海\033[0m"
     echo -e "\033[1;37m9. 优化DNS\033[0m"
     echo -e "\033[1;37m10. linux内核优化-高性能优化模式\033[0m"
     echo -e "\033[1;37m11. linux内核优化-均衡优化模式\033[0m"
@@ -432,14 +452,42 @@ set_shortcut() {
     fi
     
     # 设置当前用户的别名
-    if [ -f "$HOME/.bashrc" ]; then
-        sed -i '/^alias v=/d' "$HOME/.bashrc"
-        echo 'alias v="/usr/local/bin/linux-tools"' >> "$HOME/.bashrc"
-        source "$HOME/.bashrc" 2>/dev/null || true
+    ALIAS_LINE='alias v="/usr/local/bin/linux-tools"'
+    
+    # 更新所有可能的配置文件
+    for rc_file in "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.zshrc"; do
+        if [ -f "$rc_file" ]; then
+            sed -i '/^alias v=/d' "$rc_file"
+            echo "$ALIAS_LINE" >> "$rc_file"
+        fi
+    done
+    
+    # 尝试多种方式使别名生效
+    if [ -n "$BASH_VERSION" ]; then
+        # 如果在bash中
+        eval "$ALIAS_LINE"
+        if [ -f "$HOME/.bashrc" ]; then
+            . "$HOME/.bashrc"
+        fi
+    elif [ -n "$ZSH_VERSION" ]; then
+        # 如果在zsh中
+        eval "$ALIAS_LINE"
+        if [ -f "$HOME/.zshrc" ]; then
+            . "$HOME/.zshrc"
+        fi
     fi
     
-    echo "快捷键V设置完成！现在可以使用 v 命令快速启动脚本"
-    echo "如果没有生效，请重启终端或执行 source ~/.bashrc"
+    # 尝试在当前环境中直接定义别名
+    alias v="/usr/local/bin/linux-tools" 2>/dev/null || true
+    
+    # 尝试source系统级别的配置
+    source /etc/profile.d/linux-tools-alias.sh 2>/dev/null || true
+    
+    echo "快捷键V设置完成！"
+    echo -e "\033[33m提示：如果 v 命令现在不可用，请执行以下任一操作：\033[0m"
+    echo -e "\033[33m1. 重新打开终端\033[0m"
+    echo -e "\033[33m2. 执行命令：source ~/.bashrc\033[0m"
+    echo -e "\033[33m3. 执行命令：source /etc/profile.d/linux-tools-alias.sh\033[0m"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
@@ -505,7 +553,7 @@ set_swap() {
     if ! sudo chmod 600 /swapfile; then
         echo "设置权限失败"
         sudo rm -f /swapfile
-        echo -e "\033[1;32m��任意键返回...\033[0m"
+        echo -e "\033[1;32m任意键返回...\033[0m"
         read -n 1
         show_system_menu
         return
@@ -554,7 +602,7 @@ set_ssh_port() {
     fi
     echo "当前SSH端口: $current_port"
     
-    # 提示用户输入新端口，默��为5522
+    # 提示用户输入新端口，默为5522
     read -p "请输入新的SSH端口号(1-65535) [默认: 5522]: " new_port
     new_port=${new_port:-5522}  # 如果用户直接回车，使用默认值5522
     
@@ -989,8 +1037,8 @@ show_kernel_optimize() {
     echo -e "\033[1;34m==============================\033[0m"
     echo -e "\033[1;33mLinux系统内核参数优化\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓���管理和CPU设置。\033[0m"
-    echo -e "\033[1;37m2. 均衡化模式：       性��与源消耗之间取得平衡，适合日常使用。\033[0m"
+    echo -e "\033[1;37m1. 高性能优化模式：     大化系性能，优化文件描述符、虚拟内存、网络置、缓管理和CPU设置。\033[0m"
+    echo -e "\033[1;37m2. 均衡化模式：       性与源消耗之间取得平衡，适合日常使用。\033[0m"
     echo -e "\033[1;37m3. 网站优化模式：       针对站服务器进行优化，提高并发连接处理能力、响应速度和整体性。\033[0m"
     echo -e "\033[1;37m4. 直播优化模式：       针对直播推流的特需求进行优化，减少延迟，提高传输性能。\033[0m"
     echo -e "\033[1;37m5. 游戏服优化模式：     针对游戏服务器进行优化，提高并发处理能力和响应速度。\033[0m"
@@ -1122,7 +1170,7 @@ show_app_market() {
     esac
 }
 
-# ���加一个新的非交互式密钥配置函数
+# 添加一个新的非交互式密钥配置函数
 configure_root_key_auto() {
     # 获取真实用户信息
     REAL_USER=${SUDO_USER:-$(who am i | awk '{print $1}')}
@@ -1184,10 +1232,10 @@ server_init() {
     echo -e "\033[1;37m7. 系统内核优化为高性能模式\033[0m"
     echo -e "\033[1;37m8. 配置root密钥登入\033[0m"
     echo -e "\033[1;37m9. 设置2GB虚拟内存\033[0m"
-    echo -e "\033[1;37m10. 设置SSH端口为5522\033[0m"
-    echo -e "\033[1;37m11. 设置时区为上海\033[0m"
-    echo -e "\033[1;37m12. 优化DNS配置\033[0m"
-    echo -e "\033[1;37m13. 清理不���需要的软件包\033[0m"
+    echo -e "\033[1;37m10. 设置时区为上海\033[0m"
+    echo -e "\033[1;37m11. 优化DNS配置\033[0m"
+    echo -e "\033[1;37m12. 开启root密码登入\033[0m"
+    echo -e "\033[1;37m13. 清理不需要的软件包\033[0m"
     echo -e "\033[1;33m注意：此操作将修改系统配置。\033[0m"
     
     # 添加确认提示
@@ -1304,16 +1352,7 @@ server_init() {
     swapon /swapfile
     echo "/swapfile none swap sw 0 0" >> /etc/fstab
     
-    # 10. 设置SSH端口
-    echo -e "\n\033[1;32m[10/13] 设置SSH端口(5522)...\033[0m"
-    sed -i 's/^#*Port .*/Port 5522/' /etc/ssh/sshd_config
-    if [ -f /etc/debian_version ]; then
-        ufw allow 5522/tcp > /dev/null 2>&1
-    elif [ -f /etc/redhat-release ]; then
-        firewall-cmd --permanent --add-port=5522/tcp > /dev/null 2>&1
-        firewall-cmd --reload > /dev/null 2>&1
-    fi
-    systemctl restart sshd > /dev/null 2>&1
+
     
     # 11. 设置时区
     echo -e "\n\033[1;32m[11/13] 设置时区...\033[0m"
@@ -1337,25 +1376,54 @@ nameserver 8.8.8.8
 EOF
     fi
     
-    # 13. 清理软件包
+    # 13. 开启root密码登入并设置密码
+    echo -e "\n\033[1;32m[13/13] 开启root密码登入...\033[0m"
+    # 修改 SSH 配置允许 root 登录和密码认证
+    sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    
+    # 重启 SSH 服务
+    systemctl restart sshd > /dev/null 2>&1
+    
+    # 设置root密码
+    echo "githubvbskycn" | passwd root --stdin 2>/dev/null || echo "githubvbskycn" | chpasswd
+    
+    # 清理软件包
     echo -e "\n\033[1;32m[13/13] 清理不再需要的软件包...\033[0m"
     case "$ID" in
         ubuntu|debian|kali)
-            apt-get autoremove -y -qq && apt-get clean -qq
+            timeout 60 apt-get autoremove -y -qq || true
+            timeout 30 apt-get clean -qq || true
             ;;
         centos|redhat|fedora|alma|rocky)
-            yum autoremove -y -q && yum clean all -q
+            timeout 60 yum autoremove -y -q || true
+            timeout 30 yum clean all -q || true
             ;;
         arch)
-            pacman -Sc --noconfirm --quiet
+            timeout 60 pacman -Sc --noconfirm --quiet || true
             ;;
         alpine)
-            apk cache clean
+            timeout 30 apk cache clean || true
             ;;
     esac
 
+    # 确保所有后台进程完成
+    wait
+
+    # 添加执行完成的确认
+    if [ -f "$LOG_FILE" ]; then
+        echo -e "\n配置完成时间: $(date)" >> "$LOG_FILE"
+        echo -e "系统信息: $(uname -a)" >> "$LOG_FILE"
+        echo -e "当前用户: $(whoami)" >> "$LOG_FILE"
+    fi
+
     echo -e "\n\033[1;32m自用服务器开箱配置完成！\033[0m"
     echo -e "\033[1;33m请查看日志文件了解详细信息：$LOG_FILE\033[0m"
+    
+    # 添加同步和刷新缓存
+    sync
+    
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
