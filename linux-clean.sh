@@ -211,11 +211,28 @@ clean_docker() {
 # 修改清理系统垃圾函数
 clean_system() {
     echo -e "\n\033[1;34m[6/7] 清理系统垃圾...\033[0m"
-    local before_size=0
     
-    # 清理旧的内核
+    # 清理旧的内核，但保留当前内核和最新的备用内核
     if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
-        dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs apt-get -y purge 2>/dev/null
+        # 获取当前使用的内核版本
+        CURRENT_KERNEL=$(uname -r)
+        
+        # 列出所有已安装的内核包
+        INSTALLED_KERNELS=$(dpkg -l 'linux-*' | sed '/^ii/!d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d')
+        
+        # 获取最新的两个内核版本（当前使用的和最新的备用）
+        KEEP_KERNELS=$(echo "$INSTALLED_KERNELS" | sort -V | tail -n 2)
+        
+        # 删除旧内核，但保留这两个版本
+        for kernel in $INSTALLED_KERNELS; do
+            if ! echo "$KEEP_KERNELS" | grep -q "^$kernel$" && ! echo "$kernel" | grep -q "$CURRENT_KERNEL"; then
+                echo "清理旧内核: $kernel"
+                apt-get -y purge $kernel 2>/dev/null
+            fi
+        done
+        
+        # 更新 GRUB
+        update-grub
     fi
     
     # 清理 crash 报告
