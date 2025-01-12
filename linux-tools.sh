@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.18 让你更简单的用上Linux！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.19 让你更简单的用上Linux！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本，第一次可能需要重新链接终端 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -356,6 +356,7 @@ show_system_menu() {
     echo -e "\033[1;37m14. 开启root密码登入\033[0m"
     echo -e "\033[1;37m15. 开启root密钥登入\033[0m"
     echo -e "\033[1;37m16. 自用服务器开箱（请慎用）\033[0m"
+    echo -e "\033[1;37m17. 系统垃圾清理\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
     echo -e "\033[1;32m0. 返回上级\033[0m"
     echo -e "\033[1;34m--------------------\033[0m"
@@ -378,6 +379,7 @@ show_system_menu() {
         14|sys14) enable_root_password ;;
         15|sys15) enable_root_key ;;
         16|sys16) server_init ;;
+        17|sys17) clean_linux_system ;;
         0) show_main_menu ;;
         *) 
             echo "无效选项，请重试。"
@@ -1558,6 +1560,138 @@ enable_root_key() {
     echo -e "\033[33m公钥: $USER_KEY_FILE.pub\033[0m"
     echo -e "\033[33m请下载私钥文件后删除服务器上的私钥\033[0m"
     echo -e "\033[33m使用方法: ssh -i <私钥文件路径> -p <SSH端口> root@<服务器IP>\033[0m"
+    echo -e "\033[1;32m按任意键返回...\033[0m"
+    read -n 1
+    show_system_menu
+}
+
+# 添加系统清理函数
+clean_linux_system() {
+    # 显示清理工具信息
+    echo -e "\033[1;34m====================================\033[0m"
+    echo -e "\033[1;33m      Linux系统垃圾清理工具\033[0m"
+    echo -e "\033[1;34m====================================\033[0m"
+    echo -e "\033[1;32m支持: Ubuntu/Debian/CentOS/Fedora/Arch等\033[0m"
+    echo -e "\033[1;34m====================================\033[0m"
+
+    # 检查root权限
+    if [ "$(id -u)" != "0" ]; then
+        echo -e "\033[1;31m错误: 此脚本需要root权限才能运行\033[0m"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+
+    # 获取系统信息
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS=$ID
+    elif [ -f /etc/redhat-release ]; then
+        OS="rhel"
+    else
+        OS="unknown"
+    fi
+
+    echo -e "\033[1;33m是否开始清理系统？[y/N]\033[0m"
+    read -r response
+    if [[ ! $response =~ ^[Yy]$ ]]; then
+        echo "已取消清理"
+        echo -e "\033[1;32m按任意键返回...\033[0m"
+        read -n 1
+        show_system_menu
+        return
+    fi
+
+    # 清理包管理器缓存
+    echo -e "\n\033[1;34m[1/7] 清理包管理器缓存...\033[0m"
+    case $OS in
+        ubuntu|debian|kali)
+            apt-get clean -y
+            apt-get autoclean -y
+            apt-get autoremove -y
+            ;;
+        centos|rhel|fedora|rocky|alma)
+            yum clean all
+            dnf clean all 2>/dev/null
+            yum autoremove -y
+            ;;
+        arch|manjaro)
+            pacman -Sc --noconfirm
+            pacman -Rns $(pacman -Qtdq) --noconfirm 2>/dev/null
+            ;;
+        *)
+            echo "未知的包管理器"
+            ;;
+    esac
+
+    # 清理日志文件
+    echo -e "\n\033[1;34m[2/7] 清理系统日志...\033[0m"
+    find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    find /var/log -type f -name "*.gz" -delete
+    find /var/log -type f -name "*.old" -delete
+    if [ -d /var/log/journal ]; then
+        journalctl --vacuum-time=3d
+    fi
+    truncate -s 0 /var/log/syslog 2>/dev/null
+    truncate -s 0 /var/log/messages 2>/dev/null
+    truncate -s 0 /var/log/kern.log 2>/dev/null
+    truncate -s 0 /var/log/auth.log 2>/dev/null
+
+    # 清理临时文件
+    echo -e "\n\033[1;34m[3/7] 清理临时文件...\033[0m"
+    find /tmp -type f -atime +10 -delete 2>/dev/null
+    find /var/tmp -type f -atime +10 -delete 2>/dev/null
+    find /home -type f -name "*.thumbnail" -delete 2>/dev/null
+    find /home -type f -name "Thumbs.db" -delete 2>/dev/null
+
+    # 清理用户缓存
+    echo -e "\n\033[1;34m[4/7] 清理用户缓存...\033[0m"
+    cat /etc/passwd | grep -v "nologin\|false" | cut -d: -f6 | while read user_home; do
+        if [ -d "$user_home" ]; then
+            find "$user_home/.cache/google-chrome" -type f -delete 2>/dev/null
+            find "$user_home/.cache/mozilla" -type f -delete 2>/dev/null
+            find "$user_home/.cache/chromium" -type f -delete 2>/dev/null
+            find "$user_home/.cache/thumbnails" -type f -delete 2>/dev/null
+            find "$user_home/.cache" -type f -atime +30 -delete 2>/dev/null
+        fi
+    done
+
+    # 清理Docker缓存
+    echo -e "\n\033[1;34m[5/7] 清理Docker缓存...\033[0m"
+    if command -v docker >/dev/null 2>&1; then
+        docker image prune -af 2>/dev/null
+        docker volume prune -f 2>/dev/null
+        docker network prune -f 2>/dev/null
+        docker builder prune -af 2>/dev/null
+    fi
+
+    # 清理系统垃圾
+    echo -e "\n\033[1;34m[6/7] 清理系统垃圾...\033[0m"
+    if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
+        dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs apt-get -y purge 2>/dev/null
+    fi
+    rm -rf /var/crash/*
+    find / -type f -name "*.bak" -delete 2>/dev/null
+    find / -type f -name "*~" -delete 2>/dev/null
+    find / -type f -name "core" -delete 2>/dev/null
+
+    # 优化系统
+    echo -e "\n\033[1;34m[7/7] 优化系统...\033[0m"
+    sync; echo 3 > /proc/sys/vm/drop_caches
+    swapoff -a && swapon -a 2>/dev/null
+    updatedb 2>/dev/null
+
+    # 显示清理结果
+    echo -e "\n\033[1;34m====================================\033[0m"
+    echo -e "\033[1;32m清理完成！系统状态：\033[0m"
+    echo -e "\033[1;34m====================================\033[0m"
+    echo -e "\033[1;33m磁盘使用情况：\033[0m"
+    df -h /
+    echo -e "\n\033[1;33m内存使用情况：\033[0m"
+    free -h
+    echo -e "\n\033[1;32m系统清理完成！\033[0m"
+    
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
     show_system_menu
