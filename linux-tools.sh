@@ -8,7 +8,7 @@ show_toolbox_info() {
     echo -e "\033[1;34m | |___ | || | | || |_| | >  <|_____|| || (_) || (_) || |\__ \ \033[0m"
     echo -e "\033[1;34m |_____||_||_| |_| \__,_|/_/\_\      |_| \___/  \___/ |_||___/ \033[0m"
     echo -e "\033[1;34m==============================\033[0m"
-    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.19 让你更简单的用上Linux！\033[0m"
+    echo -e "\033[1;33mLinux-Tools 脚本工具箱 v1.30.20 让你更简单的用上Linux！\033[0m"
     echo -e "\033[1;34m适配Ubuntu/Debian/CentOS/Alpine/Kali/Arch/RedHat/Fedora/Alma/Rocky系统\033[0m"
     echo -e "\033[1;32m- 输入v可快速启动此脚本，第一次可能需要重新链接终端 -\033[0m"
     echo -e "\033[1;34m==============================\033[0m"
@@ -418,15 +418,91 @@ update_system() {
 # 清理不再需要的软件包
 clean_packages() {
     echo "正在清理不再需要的软件包..."
+    
+    # 清理包管理器缓存和不需要的依赖
     if [ -f /etc/debian_version ]; then
-        apt autoremove -y && apt clean
+        apt-get clean -y
+        apt-get autoclean -y
+        apt-get autoremove -y
+        
+        # 安全清理旧内核
+        echo "检查旧内核..."
+        # 获取当前使用的内核版本
+        CURRENT_KERNEL=$(uname -r)
+        
+        # 列出所有已安装的内核包
+        INSTALLED_KERNELS=$(dpkg -l 'linux-*' | sed '/^ii/!d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d')
+        
+        # 获取最新的两个内核版本（当前使用的和最新的备用）
+        KEEP_KERNELS=$(echo "$INSTALLED_KERNELS" | sort -V | tail -n 2)
+        
+        # 计算要清理的内核数量
+        KERNELS_TO_REMOVE=$(echo "$INSTALLED_KERNELS" | grep -v "$CURRENT_KERNEL" | grep -v "$(echo "$KEEP_KERNELS" | tail -n 1)" | wc -l)
+        
+        if [ $KERNELS_TO_REMOVE -gt 0 ]; then
+            echo "发现 $KERNELS_TO_REMOVE 个可清理的旧内核"
+            echo -e "\033[1;33m警告: 即将清理旧内核，将保留当前内核和最新的备用内核\033[0m"
+            echo -e "\033[1;33m当前内核版本: $CURRENT_KERNEL\033[0m"
+            echo -n "是否继续？[y/N] "
+            read -r response
+            if [[ $response =~ ^[Yy]$ ]]; then
+                # 删除旧内核，但保留当前内核和最新的备用内核
+                for kernel in $INSTALLED_KERNELS; do
+                    if ! echo "$KEEP_KERNELS" | grep -q "^$kernel$" && ! echo "$kernel" | grep -q "$CURRENT_KERNEL"; then
+                        echo "清理旧内核: $kernel"
+                        apt-get -y purge $kernel
+                    fi
+                done
+                
+                # 更新 GRUB
+                update-grub
+                echo "内核清理完成"
+            else
+                echo "已取消内核清理"
+            fi
+        else
+            echo "没有发现可清理的旧内核"
+        fi
+        
     elif [ -f /etc/redhat-release ]; then
-        yum autoremove -y && yum clean all
-    elif [ -f /etc/alpine-release ]; then
-        apk cache clean
+        yum clean all
+        yum autoremove -y
+        # RHEL系统的内核清理
+        echo "检查旧内核..."
+        CURRENT_KERNEL=$(uname -r)
+        INSTALLED_KERNELS=$(rpm -q kernel | sort -V)
+        KEEP_KERNELS=$(echo "$INSTALLED_KERNELS" | tail -n 2)
+        
+        KERNELS_TO_REMOVE=$(echo "$INSTALLED_KERNELS" | grep -v "$CURRENT_KERNEL" | grep -v "$(echo "$KEEP_KERNELS" | tail -n 1)" | wc -l)
+        
+        if [ $KERNELS_TO_REMOVE -gt 0 ]; then
+            echo "发现 $KERNELS_TO_REMOVE 个可清理的旧内核"
+            echo -e "\033[1;33m警告: 即将清理旧内核，将保留当前内核和最新的备用内核\033[0m"
+            echo -e "\033[1;33m当前内核版本: $CURRENT_KERNEL\033[0m"
+            echo -n "是否继续？[y/N] "
+            read -r response
+            if [[ $response =~ ^[Yy]$ ]]; then
+                for kernel in $INSTALLED_KERNELS; do
+                    if ! echo "$KEEP_KERNELS" | grep -q "^$kernel$" && ! echo "$kernel" | grep -q "$CURRENT_KERNEL"; then
+                        echo "清理旧内核: $kernel"
+                        yum remove -y "$kernel"
+                    fi
+                done
+                # 更新 GRUB
+                grub2-mkconfig -o /boot/grub2/grub.cfg
+                echo "内核清理完成"
+            else
+                echo "已取消内核清理"
+            fi
+        else
+            echo "没有发现可清理的旧内核"
+        fi
+        
     elif [ -f /etc/arch-release ]; then
         pacman -Sc --noconfirm
+        pacman -Rns $(pacman -Qtdq) --noconfirm
     fi
+    
     echo "清理完成！"
     echo -e "\033[1;32m按任意键返回...\033[0m"
     read -n 1
