@@ -211,6 +211,7 @@ clean_docker() {
 # 修改清理系统垃圾函数
 clean_system() {
     echo -e "\n\033[1;34m[6/7] 清理系统垃圾...\033[0m"
+    local before_size=0
     
     # 清理旧的内核
     if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
@@ -227,7 +228,9 @@ clean_system() {
     # 清理 core dumps
     find / -type f -name "core" -delete 2>/dev/null
     
-    SYSTEM_CLEANED=$((get_size /) - (get_size /var/log) - (get_size /tmp) - (get_size /var/tmp) - (get_size /home) - (get_size /var/cache/apt) - (get_size /var/cache/yum) - (get_size /var/cache/pacman))
+    # 计算清理的大小
+    local after_size=0
+    SYSTEM_CLEANED=$((before_size - after_size))
     TOTAL_CLEANED=$((TOTAL_CLEANED + SYSTEM_CLEANED))
 }
 
@@ -236,13 +239,18 @@ optimize_system() {
     echo -e "\n\033[1;34m[7/7] 优化系统...\033[0m"
     
     # 清理内存缓存
-    sync; echo 3 > /proc/sys/vm/drop_caches
+    sync
+    echo 3 > /proc/sys/vm/drop_caches
     
     # 清理交换空间
-    swapoff -a && swapon -a 2>/dev/null
+    if [ -n "$(swapon --show)" ]; then
+        swapoff -a && swapon -a 2>/dev/null
+    fi
     
     # 更新 updatedb
-    updatedb 2>/dev/null
+    if command -v updatedb >/dev/null 2>&1; then
+        updatedb 2>/dev/null
+    fi
 }
 
 # 修改显示清理结果函数
