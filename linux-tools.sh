@@ -424,80 +424,9 @@ clean_packages() {
         apt-get clean -y
         apt-get autoclean -y
         apt-get autoremove -y
-        
-        # 安全清理旧内核
-        echo "检查旧内核..."
-        # 获取当前使用的内核版本
-        CURRENT_KERNEL=$(uname -r)
-        
-        # 列出所有已安装的内核包
-        INSTALLED_KERNELS=$(dpkg -l 'linux-*' | sed '/^ii/!d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d')
-        
-        # 获取最新的两个内核版本（当前使用的和最新的备用）
-        KEEP_KERNELS=$(echo "$INSTALLED_KERNELS" | sort -V | tail -n 2)
-        
-        # 计算要清理的内核数量
-        KERNELS_TO_REMOVE=$(echo "$INSTALLED_KERNELS" | grep -v "$CURRENT_KERNEL" | grep -v "$(echo "$KEEP_KERNELS" | tail -n 1)" | wc -l)
-        
-        if [ $KERNELS_TO_REMOVE -gt 0 ]; then
-            echo "发现 $KERNELS_TO_REMOVE 个可清理的旧内核"
-            echo -e "\033[1;33m警告: 即将清理旧内核，将保留当前内核和最新的备用内核\033[0m"
-            echo -e "\033[1;33m当前内核版本: $CURRENT_KERNEL\033[0m"
-            echo -n "是否继续？[y/N] "
-            read -r response
-            if [[ $response =~ ^[Yy]$ ]]; then
-                # 删除旧内核，但保留当前内核和最新的备用内核
-                for kernel in $INSTALLED_KERNELS; do
-                    if ! echo "$KEEP_KERNELS" | grep -q "^$kernel$" && ! echo "$kernel" | grep -q "$CURRENT_KERNEL"; then
-                        echo "清理旧内核: $kernel"
-                        apt-get -y purge $kernel
-                    fi
-                done
-                
-                # 更新 GRUB
-                update-grub
-                echo "内核清理完成"
-            else
-                echo "已取消内核清理"
-            fi
-        else
-            echo "没有发现可清理的旧内核"
-        fi
-        
     elif [ -f /etc/redhat-release ]; then
         yum clean all
         yum autoremove -y
-        # RHEL系统的内核清理
-        echo "检查旧内核..."
-        CURRENT_KERNEL=$(uname -r)
-        INSTALLED_KERNELS=$(rpm -q kernel | sort -V)
-        KEEP_KERNELS=$(echo "$INSTALLED_KERNELS" | tail -n 2)
-        
-        KERNELS_TO_REMOVE=$(echo "$INSTALLED_KERNELS" | grep -v "$CURRENT_KERNEL" | grep -v "$(echo "$KEEP_KERNELS" | tail -n 1)" | wc -l)
-        
-        if [ $KERNELS_TO_REMOVE -gt 0 ]; then
-            echo "发现 $KERNELS_TO_REMOVE 个可清理的旧内核"
-            echo -e "\033[1;33m警告: 即将清理旧内核，将保留当前内核和最新的备用内核\033[0m"
-            echo -e "\033[1;33m当前内核版本: $CURRENT_KERNEL\033[0m"
-            echo -n "是否继续？[y/N] "
-            read -r response
-            if [[ $response =~ ^[Yy]$ ]]; then
-                for kernel in $INSTALLED_KERNELS; do
-                    if ! echo "$KEEP_KERNELS" | grep -q "^$kernel$" && ! echo "$kernel" | grep -q "$CURRENT_KERNEL"; then
-                        echo "清理旧内核: $kernel"
-                        yum remove -y "$kernel"
-                    fi
-                done
-                # 更新 GRUB
-                grub2-mkconfig -o /boot/grub2/grub.cfg
-                echo "内核清理完成"
-            else
-                echo "已取消内核清理"
-            fi
-        else
-            echo "没有发现可清理的旧内核"
-        fi
-        
     elif [ -f /etc/arch-release ]; then
         pacman -Sc --noconfirm
         pacman -Rns $(pacman -Qtdq) --noconfirm
