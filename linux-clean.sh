@@ -235,9 +235,9 @@ clean_system() {
     TOTAL_CLEANED=$((TOTAL_CLEANED + SYSTEM_CLEANED))
 }
 
-# 优化系统
+# 优清理内存缓存
 optimize_system() {
-    echo -e "\n\033[1;34m[7/7] 优化系统...\033[0m"
+    echo -e "\n\033[1;34m[7/7] 优化清理内存缓存系统,需要点时间...\033[0m"
     
     # 清理内存缓存
     sync
